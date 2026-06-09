@@ -2775,7 +2775,7 @@ function MetricSquare({ icon: Icon, value, title, sub, tone, compact, onClick }:
   );
 }
 
-function PanelBlock({ title, onView, children, accent, compact }: { title: string; onView?: () => void; children: React.ReactNode; accent?: "sky" | "rose" | "violet" | "amber" | "emerald"; compact?: boolean }) {
+function PanelBlock({ title, onView, children, accent, compact, tall }: { title: string; onView?: () => void; children: React.ReactNode; accent?: "sky" | "rose" | "violet" | "amber" | "emerald"; compact?: boolean; tall?: boolean }) {
   const accents: Record<string, { ring: string; title: string; link: string; glow: string }> = {
     sky:     { ring: "border-sky-500/30",     title: "text-sky-300",     link: "text-sky-300/80 hover:text-sky-200",     glow: "shadow-[0_0_30px_-12px_rgba(56,189,248,0.5)]" },
     rose:    { ring: "border-rose-500/30",    title: "text-rose-300",    link: "text-rose-300/80 hover:text-rose-200",    glow: "shadow-[0_0_30px_-12px_rgba(244,63,94,0.5)]" },
@@ -2786,7 +2786,7 @@ function PanelBlock({ title, onView, children, accent, compact }: { title: strin
   };
   const a = accents[accent ?? "primary"];
   return (
-    <Card className={`bg-card/60 p-2 sm:p-3 flex flex-col ${compact ? "min-h-0 max-h-[170px]" : "min-h-[140px]"} ${a.ring} ${a.glow}`}>
+    <Card className={`bg-card/60 p-2 sm:p-3 flex flex-col ${tall ? "min-h-[300px]" : compact ? "min-h-0 max-h-[170px]" : "min-h-[140px]"} ${a.ring} ${a.glow}`}>
       <div className="relative flex items-center justify-between mb-1.5">
         <div className={`text-[8px] sm:text-[11px] font-bold tracking-widest ${a.title}`}>{title}</div>
         {onView && (
