@@ -2723,6 +2723,7 @@ function AnalyticsPanel() {
         </div>
       </Card>
     </div>
+    </div>
   );
 }
 
