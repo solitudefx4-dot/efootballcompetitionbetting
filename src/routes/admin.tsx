@@ -19,12 +19,12 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import lslLogo from "@/assets/lsl-logo.png";
-import tileBattleAsset from "@/assets/tile-battle.jpg.asset.json";
-import tileVirtualAsset from "@/assets/tile-virtual.jpg.asset.json";
-import tileChallengesAsset from "@/assets/tile-challenges.jpg.asset.json";
+import tileBattle from "@/assets/tile-battle.jpg";
+import tileVirtual from "@/assets/tile-virtual.jpg";
+import tileChallenges from "@/assets/tile-challenges.jpg";
 import tileReferrals from "@/assets/tile-referrals.jpg";
-import tileUsersAsset from "@/assets/tile-users.jpg.asset.json";
-import tileClansAsset from "@/assets/tile-clans.jpg.asset.json";
+import tileUsers from "@/assets/tile-users.jpg";
+import tileClans from "@/assets/tile-clans.jpg";
 import consoleHeaderBgAsset from "@/assets/console-header-bg.jpg.asset.json";
 import leagueSkullFire from "@/assets/league-skull-fire.jpg";
 import { Countdown } from "@/components/Countdown";
@@ -2701,12 +2701,12 @@ function AnalyticsPanel() {
       {/* ROW 9 — 5 module tiles */}
       <div className="grid grid-cols-6 gap-2 sm:gap-3">
         {[
-          { l: "VIRTUAL", s: "Manage virtual matches and rounds", t: "virtual", img: tileVirtualAsset.url },
-          { l: "BATTLE", s: "Manage matches, fixtures and outcomes", t: "matches", img: tileBattleAsset.url },
-          { l: "CHALLENGES", s: "Create and manage gang challenges", t: "challenges", img: tileChallengesAsset.url },
+          { l: "VIRTUAL", s: "Manage virtual matches and rounds", t: "virtual", img: tileVirtual },
+          { l: "BATTLE", s: "Manage matches, fixtures and outcomes", t: "matches", img: tileBattle },
+          { l: "CHALLENGES", s: "Create and manage gang challenges", t: "challenges", img: tileChallenges },
           { l: "REFERRALS", s: "Manage referrals and commissions", t: "referrals", img: tileReferrals },
-          { l: "USERS", s: "Manage users, profiles and access", t: "users", img: tileUsersAsset.url },
-          { l: "CLANS", s: "Manage gangs, teams and players", t: "clans", img: tileClansAsset.url },
+          { l: "USERS", s: "Manage users, profiles and access", t: "users", img: tileUsers },
+          { l: "CLANS", s: "Manage gangs, teams and players", t: "clans", img: tileClans },
         ].map((m) => (
           <Card key={m.l} className="border-primary/20 bg-card/60 p-2 sm:p-3 flex flex-col">
             <button type="button" onClick={() => setActiveTabFromAnalytics(nav, m.t)} className="relative aspect-square w-full mb-1 rounded overflow-hidden border border-primary/20 hover:border-primary/60 transition active:scale-95">
