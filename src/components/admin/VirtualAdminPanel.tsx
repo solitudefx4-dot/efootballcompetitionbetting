@@ -28,6 +28,7 @@ type Round = {
 type AuditEntry = { id: string; action: string; target_id: string | null; actor_id: string | null; created_at: string; metadata: any };
 
 export function VirtualAdminPanel() {
+  const confirm = useConfirm();
   const [teams, setTeams] = useState<TeamOpt[]>([]);
   const [rounds, setRounds] = useState<Round[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
