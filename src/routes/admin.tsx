@@ -45,6 +45,7 @@ import { SpotlightsAdminPanel } from "@/components/Spotlight";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ClansAdminPanel } from "@/components/admin/ClansAdminPanel";
 import { TopBetsPanel } from "@/components/admin/TopBetsPanel";
+import { TournamentAdminPanel } from "@/components/admin/TournamentAdminPanel";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/admin")({
@@ -193,6 +194,7 @@ function AdminPage() {
             <TabsContent value="spotlights" className="mt-4"><SpotlightsAdminPanel /></TabsContent>
             <TabsContent value="clans" className="mt-4"><ClansAdminPanel /></TabsContent>
             <TabsContent value="topbets" className="mt-4"><TopBetsPanel /></TabsContent>
+            <TabsContent value="tournaments" className="mt-4"><TournamentAdminPanel /></TabsContent>
           </Tabs>
         </div>
       </main>
