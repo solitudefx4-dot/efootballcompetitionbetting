@@ -41,6 +41,7 @@ export function ClansAdminPanel() {
 }
 
 function GangsTab() {
+  const confirm = useConfirm();
   const [gangs, setGangs] = useState<Gang[]>([]);
   async function load() {
     const { data } = await supabase.from("profiles").select("gang_name, gang_type").not("gang_name", "is", null);
@@ -56,7 +57,7 @@ function GangsTab() {
   }
   useEffect(() => { load(); }, []);
   async function removeGang(name: string) {
-    if (!confirm(`Delete ${name} from all member profiles?`)) return;
+    if (!await confirm({ title: `Disband ${name}?`, description: `The gang / faction tag "${name}" will be removed from every member profile. Members keep their accounts and tokens.`, tone: "danger", confirmText: "Disband gang" })) return;
     const { error } = await supabase.from("profiles").update({ gang_name: null, gang_type: null } as any).eq("gang_name", name);
     if (error) return toast.error(error.message);
     toast.success("Gang / faction removed");
