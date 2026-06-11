@@ -1209,7 +1209,9 @@ async function settleBetsForMatch(matchId: string, winnerTeamId: string | null, 
       const norm = (v: string) => v.replace(/[^0-9]/g, "-").replace(/-+/g, "-");
       result = norm(oddLabel) === norm(scoreLabel) ? "won" : "lost";
     } else {
-      result = oddLabel === winnerLabel ? "won" : "lost";
+      // Tolerant match: ignore case + surrounding whitespace so labels still settle.
+      const norm = (v: string) => (v ?? "").trim().toLowerCase();
+      result = winnerLabel != null && norm(oddLabel) === norm(winnerLabel) ? "won" : "lost";
     }
     await supabase.from("bet_selections").update({ result }).eq("id", s.id);
   }
