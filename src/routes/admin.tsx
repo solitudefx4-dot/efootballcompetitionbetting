@@ -1459,7 +1459,7 @@ function FuturesAdminPanel() {
     load();
   }
   async function archiveFuture(id: string) {
-    if (!confirm("Archive this futures market?")) return;
+    if (!await confirm({ title: "Archive this futures market?", description: "It will be hidden from the homepage and admin list. Existing tickets keep their records.", tone: "danger", confirmText: "Archive" })) return;
     await supabase.from("matches").update({ is_archived: true }).eq("id", id);
     load();
   }
