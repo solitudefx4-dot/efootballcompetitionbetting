@@ -185,7 +185,7 @@ function PlayersTab() {
     setEdit(null); toast.success("Saved"); load();
   }
   async function remove(id: string) {
-    if (!confirm("Delete this player?")) return;
+    if (!await confirm({ title: "Delete this player?", description: "The shooter will be removed from the roster. Leaderboard history already recorded is kept.", tone: "danger", confirmText: "Delete player" })) return;
     const { error } = await supabase.from("players").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted"); load();
