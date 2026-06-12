@@ -3020,6 +3020,7 @@ function AnalyticsPanel() {
                 { i: BarChart3, l: "Reports", t: "reports" },
                 { i: AlertTriangle, l: "Risk", t: "risk" },
                 { i: Trophy, l: "Seasons", t: "seasons" },
+                { i: Trophy, l: "Tournaments", t: "tournaments" },
                 { i: SettingsIcon, l: "Settings", t: "settings" },
                 { i: Sparkles, l: "Spotlights", t: "spotlights" },
                 { i: Sparkles, l: "Streak/Push", t: "streakpush" },
