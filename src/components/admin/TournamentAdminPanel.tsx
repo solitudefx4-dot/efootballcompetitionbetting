@@ -43,6 +43,7 @@ export function TournamentAdminPanel() {
   const [participants, setParticipants] = useState<TParticipant[]>([]);
   const [matches, setMatches] = useState<TMatch[]>([]);
   const [futureMatches, setFutureMatches] = useState<any[]>([]);
+  const [linkableMatches, setLinkableMatches] = useState<Array<{ id: string; name: string; home_score: number | null; away_score: number | null; status: string }>>([]);
   const [roster, setRoster] = useState<Array<{ id: string; name: string; logo_url: string | null; kind: "player" | "team" }>>([]);
 
   // create form
@@ -58,6 +59,7 @@ export function TournamentAdminPanel() {
   const [resultMatch, setResultMatch] = useState<TMatch | null>(null);
   const [sA, setSA] = useState("");
   const [sB, setSB] = useState("");
+  const [linkId, setLinkId] = useState("");
 
   const sel = useMemo(() => tournaments.find((t) => t.id === selId) ?? null, [tournaments, selId]);
   const partMap = useMemo(() => Object.fromEntries(participants.map((p) => [p.id, p])), [participants]);
@@ -74,6 +76,8 @@ export function TournamentAdminPanel() {
     if (!selId && data?.length) setSelId(data[0].id);
     const { data: fm } = await (supabase as any).from("matches").select("id,name").eq("match_kind", "future").eq("is_archived", false).order("created_at", { ascending: false });
     setFutureMatches(fm ?? []);
+    const { data: lm } = await (supabase as any).from("matches").select("id,name,home_score,away_score,status").eq("is_archived", false).eq("is_virtual", false).order("start_time", { ascending: false }).limit(300);
+    setLinkableMatches(lm ?? []);
     const [{ data: pls }, { data: tms }] = await Promise.all([
       supabase.from("players").select("id,name,avatar_url").order("name"),
       supabase.from("teams").select("id,name,logo_url").order("name"),
@@ -225,14 +229,41 @@ export function TournamentAdminPanel() {
     setResultMatch(m);
     setSA(m.score_a != null ? String(m.score_a) : "");
     setSB(m.score_b != null ? String(m.score_b) : "");
+    setLinkId((m as any).match_id ?? "");
   }
-  async function submitResult(winnerId: string | null) {
+
+  // Link / unlink a real match to this bracket slot. Once linked, the DB trigger
+  // keeps score_a/score_b in sync with the live match's score automatically.
+  async function linkLiveMatch(matchId: string) {
+    if (!resultMatch) return;
+    setLinkId(matchId);
+    const { error } = await (supabase as any).from("tournament_matches").update({ match_id: matchId || null }).eq("id", resultMatch.id);
+    if (error) { toast.error(error.message); return; }
+    if (matchId) {
+      const lm = linkableMatches.find((x) => x.id === matchId);
+      if (lm) {
+        // pull current scores immediately so the admin can review them
+        await (supabase as any).from("tournament_matches").update({ score_a: lm.home_score ?? 0, score_b: lm.away_score ?? 0 }).eq("id", resultMatch.id);
+        setSA(String(lm.home_score ?? 0));
+        setSB(String(lm.away_score ?? 0));
+      }
+      toast.success("Linked — scores will auto-update from this match");
+    } else {
+      toast.success("Unlinked from live match");
+    }
+    setResultMatch({ ...resultMatch, match_id: matchId || null } as TMatch);
+    if (sel) loadDetail(sel.id);
+  }
+
+  async function submitResult(winnerId: string | null, outcome: string | null = null, dqId: string | null = null) {
     if (!resultMatch) return;
     const { error } = await (supabase as any).rpc("set_tournament_result", {
       _match_id: resultMatch.id,
       _score_a: sA === "" ? null : Number(sA),
       _score_b: sB === "" ? null : Number(sB),
       _winner_id: winnerId,
+      _outcome: outcome,
+      _dq_id: dqId,
     });
     if (error) { toast.error(error.message); return; }
     toast.success(winnerId ? "Result saved — winner advanced" : "Scores saved");
@@ -389,8 +420,27 @@ export function TournamentAdminPanel() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-gold" />
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Swords className="h-5 w-5 text-primary" />{resultMatch?.label ?? "Match"} Result</DialogTitle>
-            <DialogDescription>Enter the score for each side, then choose who advances to the next round.</DialogDescription>
+            <DialogDescription>Link a live match to auto-fill scores, then mark each shooter Won, Qualified, Lost or Disqualified.</DialogDescription>
           </DialogHeader>
+
+          {/* link a real/live match — scores then auto-sync from it */}
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Linked live match (scores auto-update from it)</Label>
+            <select
+              className="w-full bg-background border border-border rounded-md text-sm px-2 py-1.5"
+              value={linkId}
+              onChange={(e) => linkLiveMatch(e.target.value)}
+            >
+              <option value="">— not linked —</option>
+              {linkableMatches.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name} · {f.home_score ?? 0}–{f.away_score ?? 0} ({f.status})
+                </option>
+              ))}
+            </select>
+            {linkId && <p className="text-[11px] text-emerald-400">Scores below are pulled from the live match. They auto-update whenever the match score changes.</p>}
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground truncate">{rA?.name ?? "Slot A (TBD)"} — score</Label>
@@ -401,10 +451,26 @@ export function TournamentAdminPanel() {
               <Input type="number" min={0} value={sB} onChange={(e) => setSB(e.target.value)} placeholder="0" />
             </div>
           </div>
-          <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <div className="grid grid-cols-2 gap-2 w-full">
-              <Button className="btn-luxury" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id)}><Crown className="h-4 w-4 mr-1" />{rA?.name ?? "A"} wins</Button>
-              <Button className="btn-luxury" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id)}><Crown className="h-4 w-4 mr-1" />{rB?.name ?? "B"} wins</Button>
+          <DialogFooter className="flex-col gap-3 sm:flex-col">
+            {/* Participant A outcomes */}
+            <div className="w-full space-y-1.5">
+              <div className="text-xs font-bold flex items-center gap-1 text-amber-200 truncate"><Crown className="h-3.5 w-3.5 text-primary" />{rA?.name ?? "Slot A"}</div>
+              <div className="grid grid-cols-4 gap-1.5">
+                <Button size="sm" className="btn-luxury text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "won")}>Won</Button>
+                <Button size="sm" variant="outline" className="text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "qualified")}>Qualified</Button>
+                <Button size="sm" variant="outline" className="text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "won")}>Lost</Button>
+                <Button size="sm" variant="destructive" className="text-xs" disabled={!rB || !rA} onClick={() => submitResult(resultMatch!.participant_b_id, "won", resultMatch!.participant_a_id)}>DQ</Button>
+              </div>
+            </div>
+            {/* Participant B outcomes */}
+            <div className="w-full space-y-1.5">
+              <div className="text-xs font-bold flex items-center gap-1 text-amber-200 truncate"><Crown className="h-3.5 w-3.5 text-primary" />{rB?.name ?? "Slot B"}</div>
+              <div className="grid grid-cols-4 gap-1.5">
+                <Button size="sm" className="btn-luxury text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "won")}>Won</Button>
+                <Button size="sm" variant="outline" className="text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "qualified")}>Qualified</Button>
+                <Button size="sm" variant="outline" className="text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "won")}>Lost</Button>
+                <Button size="sm" variant="destructive" className="text-xs" disabled={!rA || !rB} onClick={() => submitResult(resultMatch!.participant_a_id, "won", resultMatch!.participant_b_id)}>DQ</Button>
+              </div>
             </div>
             <Button variant="outline" className="w-full" onClick={() => submitResult(null)}>Save scores only (no winner yet)</Button>
           </DialogFooter>

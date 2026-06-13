@@ -3,11 +3,12 @@ import { Crown, Target, Trophy, Users, Crosshair, Swords } from "lucide-react";
 import { ScaleToFit } from "./ScaleToFit";
 import lslLogo from "@/assets/lsl-logo.png";
 
-export type TParticipant = { id: string; name: string; logo_url: string | null; is_eliminated: boolean; current_round: number };
+export type TParticipant = { id: string; name: string; logo_url: string | null; is_eliminated: boolean; current_round: number; is_disqualified?: boolean };
 export type TMatch = {
   id: string; round: number; round_name: string | null; slot: number; label: string | null;
   participant_a_id: string | null; participant_b_id: string | null;
   score_a: number | null; score_b: number | null; winner_id: string | null; status: string;
+  match_id?: string | null; result_label?: string | null;
 };
 export type Tournament = { id: string; name: string; tagline: string | null; event_date: string | null; status: string; champion_id: string | null; futures_match_id?: string | null };
 
@@ -186,9 +187,10 @@ export function TournamentBracket({
                   }}
                 >
                   {m.label && <div className="absolute -top-[15px] left-2 text-[10px] font-black tracking-widest text-amber-300">{m.label}</div>}
-                  <Side name={a?.name} logo={a?.logo_url} win={!!winA} score={m.score_a} dimmed={done && !winA} />
+                  {m.match_id && <div className="absolute -top-[15px] right-2 text-[9px] font-black tracking-widest text-emerald-400">● LIVE-LINKED</div>}
+                  <Side name={a?.name} logo={a?.logo_url} win={!!winA} score={m.score_a} dimmed={done && !winA} dq={!!a?.is_disqualified} />
                   <div className="mx-2 h-px bg-amber-400/20" />
-                  <Side name={b?.name} logo={b?.logo_url} win={!!winB} score={m.score_b} dimmed={done && !winB} />
+                  <Side name={b?.name} logo={b?.logo_url} win={!!winB} score={m.score_b} dimmed={done && !winB} dq={!!b?.is_disqualified} />
                 </button>
               );
             }),
@@ -248,8 +250,8 @@ export function TournamentBracket({
   );
 }
 
-function Side({ name, logo, win, score, dimmed }: { name?: string | null; logo?: string | null; win: boolean; score: number | null; dimmed: boolean }) {
-  return SideRow({ name, logo, win, score, dimmed });
+function Side({ name, logo, win, score, dimmed, dq }: { name?: string | null; logo?: string | null; win: boolean; score: number | null; dimmed: boolean; dq?: boolean }) {
+  return SideRow({ name, logo, win, score, dimmed, dq });
 }
 
 function SeedBadge({ n, cy }: { n: number; cy: number }) {
@@ -263,7 +265,7 @@ function SeedBadge({ n, cy }: { n: number; cy: number }) {
   );
 }
 
-function SideRow({ name, logo, win, score, dimmed }: { name?: string | null; logo?: string | null; win: boolean; score: number | null; dimmed: boolean }) {
+function SideRow({ name, logo, win, score, dimmed, dq }: { name?: string | null; logo?: string | null; win: boolean; score: number | null; dimmed: boolean; dq?: boolean }) {
   return (
     <div className={`flex items-center justify-between px-2.5 h-[29px] ${dimmed ? "opacity-40" : ""}`}>
       <span className="flex items-center gap-1.5 min-w-0">
@@ -271,6 +273,7 @@ function SideRow({ name, logo, win, score, dimmed }: { name?: string | null; log
           ? <img src={logo} alt="" className="h-4 w-4 rounded-sm object-cover border border-amber-400/30 shrink-0" />
           : name ? <span className="h-4 w-4 rounded-sm bg-amber-400/15 border border-amber-400/30 grid place-items-center text-[8px] font-bold text-amber-300 shrink-0">{name.charAt(0).toUpperCase()}</span> : null}
         <span className={`text-[13px] font-bold truncate ${win ? "text-amber-300" : "text-amber-50/90"}`}>{name ?? "—"}</span>
+        {dq && <span className="text-[8px] font-black tracking-widest text-red-400 border border-red-400/50 rounded px-1 shrink-0">DQ</span>}
       </span>
       {score != null && <span className={`text-[13px] font-black tabular-nums ${win ? "text-amber-300" : "text-amber-50/60"}`}>{score}</span>}
     </div>
