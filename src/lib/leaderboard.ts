@@ -67,8 +67,9 @@ export async function loadStandings(): Promise<Standings> {
     const countForShooters = ts >= shootersReset;
     if (!countForGangs && !countForShooters) return;
     if (m.match_kind === "future") return;
-    const homePresent = m.home_present !== false;
-    const awayPresent = m.away_present !== false;
+    // Strict: a side only counts toward the leaderboard when explicitly marked Present.
+    const homePresent = m.home_present === true;
+    const awayPresent = m.away_present === true;
 
     if (m.match_kind === "shooter") {
       if (!countForShooters) return;

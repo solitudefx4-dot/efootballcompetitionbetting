@@ -100,20 +100,20 @@ export function BetVoucher({ bet, sels, statusBadge, copy, shareCode }: {
   copy: (t: string) => void; shareCode: () => void;
 }) {
   const status = bet.status as string;
-  // A selection counts as "winning so far" while a match/tournament is still running.
-  function provWin(s: any): boolean {
+  // A selection only counts as a win once its match has ENDED (no cash-out while live).
+  function endedWin(s: any): boolean {
     if (s.result === "won") return true;
     if (s.result === "lost") return false;
     const m = s.matches;
-    if (m?.match_kind === "future") return ["qualified", "winner"].includes(s.odds?.future_status);
-    if (!m || (m.status !== "live" && m.status !== "ended")) return false;
+    if (m?.match_kind === "future") return s.odds?.future_status === "winner";
+    if (!m || m.status !== "ended") return false;
     if (s.markets?.name === "Correct Score") return s.selection_label === `${m.home_score}-${m.away_score}`;
     const lead = m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
     return s.selection_label === lead;
   }
-  const allWinning = sels.length > 0 && sels.every(provWin);
-  const isFullWin = sels.length > 0 && sels.every((s: any) => s.result === "won");
-  const cashoutValue = isFullWin ? Number(bet.potential_payout) : Math.floor(Number(bet.potential_payout) * 0.8);
+  // Cash-out only when every match has ended and every selection won.
+  const allWon = sels.length > 0 && sels.every(endedWin);
+  const cashoutValue = Number(bet.potential_payout);
   const isVirtualTicket = sels.some((s: any) => s.matches?.is_virtual);
   const isFutureTicket = sels.some((s: any) => s.matches?.match_kind === "future");
   const statusBarCls =
@@ -328,13 +328,13 @@ export function BetVoucher({ bet, sels, statusBadge, copy, shareCode }: {
             <span className="text-center">{statusBarText}</span>
           </div>
 
-          {/* CASHOUT (open + every selection currently winning) */}
-          {status === "open" && allWinning && (
-            <CashoutButton betId={bet.id} amount={cashoutValue} full={isFullWin} />
+          {/* CASHOUT (open + every match ended and won) */}
+          {status === "open" && allWon && (
+            <CashoutButton betId={bet.id} amount={cashoutValue} full={true} />
           )}
-          {status === "open" && !allWinning && (
+          {status === "open" && !allWon && (
             <div className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1">
-              <LockIcon className="h-3 w-3" />Cash-out unlocks while every selection is winning so far.
+              <LockIcon className="h-3 w-3" />Cash-out unlocks once all your matches have ended and every selection has won.
             </div>
           )}
           {isVirtualTicket && status === "won" && (

@@ -1135,7 +1135,7 @@ function MatchesPanel() {
   }
   async function togglePresence(m: any, side: "home" | "away") {
     const field = side === "home" ? "home_present" : "away_present";
-    const current = m[field] !== false;
+    const current = m[field] === true;
     const { error } = await supabase.from("matches").update({ [field]: !current } as any).eq("id", m.id);
     if (error) { toast.error(error.message); return; }
     await logAudit("match_presence", "match", m.id, { side, present: !current });
@@ -1226,15 +1226,15 @@ function MatchesPanel() {
             </div>
             <div className="w-full flex flex-wrap items-center gap-2 border-t border-border/40 pt-2 mt-1">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Leaderboard attendance:</span>
-              <Button size="sm" variant={m.home_present !== false ? "default" : "destructive"} onClick={() => togglePresence(m, "home")}>
-                {m.home_present !== false ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
-                {(m.match_kind === "shooter" ? m.home_player?.name : m.home_team?.name) ?? "Home"}: {m.home_present !== false ? "Present" : "Absent"}
+              <Button size="sm" variant={m.home_present === true ? "default" : "destructive"} onClick={() => togglePresence(m, "home")}>
+                {m.home_present === true ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
+                {(m.match_kind === "shooter" ? m.home_player?.name : m.home_team?.name) ?? "Home"}: {m.home_present === true ? "Present" : "Absent"}
               </Button>
-              <Button size="sm" variant={m.away_present !== false ? "default" : "destructive"} onClick={() => togglePresence(m, "away")}>
-                {m.away_present !== false ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
-                {(m.match_kind === "shooter" ? m.away_player?.name : m.away_team?.name) ?? "Away"}: {m.away_present !== false ? "Present" : "Absent"}
+              <Button size="sm" variant={m.away_present === true ? "default" : "destructive"} onClick={() => togglePresence(m, "away")}>
+                {m.away_present === true ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
+                {(m.match_kind === "shooter" ? m.away_player?.name : m.away_team?.name) ?? "Away"}: {m.away_present === true ? "Present" : "Absent"}
               </Button>
-              <span className="text-[9px] text-muted-foreground">Only sides marked <b>Present</b> earn leaderboard stats when the match ends.</span>
+              <span className="text-[9px] text-muted-foreground">Only sides explicitly marked <b>Present</b> earn leaderboard stats when the match ends.</span>
             </div>
           </Card>
         ))}
@@ -1319,7 +1319,7 @@ async function settleFutureBets(matchId: string, winningOddIds: string[], winnin
 function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
   const [players, setPlayers] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
-  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, marketing: true, homePresent: true, awayPresent: true, restrictRepeat: false });
+  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, marketing: true, homePresent: false, awayPresent: false, restrictRepeat: false });
 
   useEffect(() => {
     Promise.all([
@@ -1643,7 +1643,7 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
   const [cats, setCats] = useState<any[]>([]);
   const [teamA, setTeamA] = useState({ id: "", name: "", logoFile: null as File | null, mainPlayers: "", subPlayers: "" });
   const [teamB, setTeamB] = useState({ id: "", name: "", logoFile: null as File | null, mainPlayers: "", subPlayers: "" });
-  const [details, setDetails] = useState({ homeIs: "A" as "A" | "B", oddsA: 2.0, draw: 3.5, oddsB: 2.0, name: "", start_time: "", location: "", category_id: "", featured: false, homePresent: true, awayPresent: true, restrictRepeat: false });
+  const [details, setDetails] = useState({ homeIs: "A" as "A" | "B", oddsA: 2.0, draw: 3.5, oddsB: 2.0, name: "", start_time: "", location: "", category_id: "", featured: false, homePresent: false, awayPresent: false, restrictRepeat: false });
   const [csEnabled, setCsEnabled] = useState(true);
   const [csRows, setCsRows] = useState<Array<{ label: string; value: number }>>(
     POPULAR_SCORES.map(([h, a]) => {
