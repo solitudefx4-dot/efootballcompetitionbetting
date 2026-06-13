@@ -3038,76 +3038,7 @@ function AnalyticsPanel() {
             </button>
           ))}
         </PanelBlock>
-        <PanelBlock title="QUICK ACTIONS" compact>
-          <div className="max-h-[120px] sm:max-h-[140px] overflow-y-auto pr-1 -mr-1">
-            <div className="grid grid-cols-3 gap-1">
-              {[
-                { i: BarChart3, l: "Analytics", t: "analytics" },
-                { i: Users, l: "Users", t: "users" },
-                { i: Shield, l: "Banned", t: "bannedusers" },
-                { i: Sparkles, l: "Admin AI", t: "adminai" },
-                { i: AlertTriangle, l: "Appeals", t: "appeals" },
-                { i: History, l: "Audit", t: "audit" },
-                { i: ClipboardList, l: "Bet Tracker", t: "bettracker" },
-                { i: Send, l: "Broadcast", t: "broadcast" },
-                { i: Sparkles, l: "Challenges", t: "challenges" },
-                { i: MessageSquare, l: "Chat", t: "chat" },
-                { i: Megaphone, l: "Content", t: "content" },
-                { i: Target, l: "Futures", t: "futures" },
-                { i: Trophy, l: "Emblems", t: "emblems" },
-                { i: Calendar, l: "Events", t: "events" },
-                { i: Wallet, l: "House Wallet", t: "housewallet" },
-                { i: ListOrdered, l: "Leaderboard", t: "leaderboard" },
-                { i: Trophy, l: "Matches", t: "matches" },
-                { i: Send, l: "Notify", t: "notify" },
-                { i: BarChart3, l: "P&L", t: "pnl" },
-                { i: Tag, l: "Promo Codes", t: "promos" },
-                { i: Tag, l: "Promo Reqs", t: "promoreqs" },
-                { i: Users, l: "Referrals", t: "referrals" },
-                { i: BarChart3, l: "Reports", t: "reports" },
-                { i: AlertTriangle, l: "Risk", t: "risk" },
-                { i: Trophy, l: "Seasons", t: "seasons" },
-                { i: Trophy, l: "Tournaments", t: "tournaments" },
-                { i: SettingsIcon, l: "Settings", t: "settings" },
-                { i: Sparkles, l: "Spotlights", t: "spotlights" },
-                { i: Sparkles, l: "Streak/Push", t: "streakpush" },
-                { i: ClipboardList, l: "Tasks", t: "tasks" },
-                { i: Ticket, l: "Tickets", t: "tickets" },
-                { i: Coins, l: "Tokens", t: "tokens" },
-                { i: Coins, l: "Token Rules", t: "tokenrules" },
-                { i: Coins, l: "Token Move", t: "tokenmovement" },
-                { i: Users, l: "Activity", t: "activity" },
-                { i: Dice5, l: "Virtual", t: "virtual" },
-                { i: Trophy, l: "VIP", t: "vip" },
-                { i: Wallet, l: "Withdrawals", t: "withdrawals" },
-                { i: Trophy, l: "Won Bets", t: "wonbets" },
-                { i: X, l: "Lost Bets", t: "lostbets" },
-              ].map((q, idx) => {
-                const palette = [
-                  { ic: "text-emerald-400", bd: "border-emerald-500/30 hover:border-emerald-400/70 hover:bg-emerald-500/10" },
-                  { ic: "text-sky-400",     bd: "border-sky-500/30 hover:border-sky-400/70 hover:bg-sky-500/10" },
-                  { ic: "text-rose-400",    bd: "border-rose-500/30 hover:border-rose-400/70 hover:bg-rose-500/10" },
-                  { ic: "text-amber-400",   bd: "border-amber-500/30 hover:border-amber-400/70 hover:bg-amber-500/10" },
-                  { ic: "text-violet-400",  bd: "border-violet-500/30 hover:border-violet-400/70 hover:bg-violet-500/10" },
-                  { ic: "text-fuchsia-400", bd: "border-fuchsia-500/30 hover:border-fuchsia-400/70 hover:bg-fuchsia-500/10" },
-                  { ic: "text-cyan-400",    bd: "border-cyan-500/30 hover:border-cyan-400/70 hover:bg-cyan-500/10" },
-                  { ic: "text-lime-400",    bd: "border-lime-500/30 hover:border-lime-400/70 hover:bg-lime-500/10" },
-                  { ic: "text-orange-400",  bd: "border-orange-500/30 hover:border-orange-400/70 hover:bg-orange-500/10" },
-                  { ic: "text-pink-400",    bd: "border-pink-500/30 hover:border-pink-400/70 hover:bg-pink-500/10" },
-                  { ic: "text-teal-400",    bd: "border-teal-500/30 hover:border-teal-400/70 hover:bg-teal-500/10" },
-                  { ic: "text-indigo-400",  bd: "border-indigo-500/30 hover:border-indigo-400/70 hover:bg-indigo-500/10" },
-                ];
-                const c = palette[idx % palette.length];
-                return (
-                  <button key={q.l} onClick={() => setActiveTabFromAnalytics(nav, q.t)} className={`flex flex-col items-center gap-0.5 p-1 rounded border active:scale-95 transition ${c.bd}`}>
-                    <q.i className={`h-3 w-3 ${c.ic}`} />
-                    <span className="text-[7px] sm:text-[9px] text-foreground text-center leading-tight">{q.l}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </PanelBlock>
+        <MiniLeaderboardPanel onOpen={() => setActiveTabFromAnalytics(nav, "leaderboard")} />
         <TopBetsPanel />
       </div>
 
