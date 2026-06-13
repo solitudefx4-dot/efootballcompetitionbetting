@@ -1226,15 +1226,15 @@ function MatchesPanel() {
             </div>
             <div className="w-full flex flex-wrap items-center gap-2 border-t border-border/40 pt-2 mt-1">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Leaderboard attendance:</span>
-              <Button size="sm" variant={m.home_present !== false ? "default" : "destructive"} onClick={() => togglePresence(m, "home")}>
-                {m.home_present !== false ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
-                {(m.match_kind === "shooter" ? m.home_player?.name : m.home_team?.name) ?? "Home"}: {m.home_present !== false ? "Present" : "Absent"}
+              <Button size="sm" variant={m.home_present === true ? "default" : "destructive"} onClick={() => togglePresence(m, "home")}>
+                {m.home_present === true ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
+                {(m.match_kind === "shooter" ? m.home_player?.name : m.home_team?.name) ?? "Home"}: {m.home_present === true ? "Present" : "Absent"}
               </Button>
-              <Button size="sm" variant={m.away_present !== false ? "default" : "destructive"} onClick={() => togglePresence(m, "away")}>
-                {m.away_present !== false ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
-                {(m.match_kind === "shooter" ? m.away_player?.name : m.away_team?.name) ?? "Away"}: {m.away_present !== false ? "Present" : "Absent"}
+              <Button size="sm" variant={m.away_present === true ? "default" : "destructive"} onClick={() => togglePresence(m, "away")}>
+                {m.away_present === true ? <Check className="h-3 w-3 mr-1" /> : <X className="h-3 w-3 mr-1" />}
+                {(m.match_kind === "shooter" ? m.away_player?.name : m.away_team?.name) ?? "Away"}: {m.away_present === true ? "Present" : "Absent"}
               </Button>
-              <span className="text-[9px] text-muted-foreground">Only sides marked <b>Present</b> earn leaderboard stats when the match ends.</span>
+              <span className="text-[9px] text-muted-foreground">Only sides explicitly marked <b>Present</b> earn leaderboard stats when the match ends.</span>
             </div>
           </Card>
         ))}
