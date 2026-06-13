@@ -3,11 +3,12 @@ import { Crown, Target, Trophy, Users, Crosshair, Swords } from "lucide-react";
 import { ScaleToFit } from "./ScaleToFit";
 import lslLogo from "@/assets/lsl-logo.png";
 
-export type TParticipant = { id: string; name: string; logo_url: string | null; is_eliminated: boolean; current_round: number };
+export type TParticipant = { id: string; name: string; logo_url: string | null; is_eliminated: boolean; current_round: number; is_disqualified?: boolean };
 export type TMatch = {
   id: string; round: number; round_name: string | null; slot: number; label: string | null;
   participant_a_id: string | null; participant_b_id: string | null;
   score_a: number | null; score_b: number | null; winner_id: string | null; status: string;
+  match_id?: string | null; result_label?: string | null;
 };
 export type Tournament = { id: string; name: string; tagline: string | null; event_date: string | null; status: string; champion_id: string | null; futures_match_id?: string | null };
 
