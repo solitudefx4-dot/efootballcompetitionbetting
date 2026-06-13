@@ -65,7 +65,8 @@ function Page() {
     <Layout>
       <div className="container py-8 max-w-5xl">
         <div className="relative mb-6 rounded-2xl overflow-hidden border border-primary/30 bg-gradient-to-br from-emerald-950/60 via-card/40 to-black/60 backdrop-blur-2xl shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)]">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent" />
+      <div className="relative mb-6 rounded-2xl overflow-hidden glass-ice border border-primary/30">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent" />
           <div className="relative flex items-center gap-3 px-5 py-5">
             <span className="grid place-items-center h-12 w-12 rounded-xl border border-amber-400/40 bg-black/40 shadow-[0_0_20px_-4px_rgba(212,175,55,0.6)]">
               <Trophy className="h-6 w-6 text-amber-300" />
