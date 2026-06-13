@@ -1448,7 +1448,7 @@ function FuturesAdminPanel() {
     setTeams(tm ?? []);
     setPlayers(pl ?? []);
     const { data: lm } = await supabase.from("matches")
-      .select("id,name,home_score,away_score,status,home_team:teams!home_team_id(name),away_team:teams!away_team_id(name)")
+      .select("id,name,home_score,away_score,status,home_team:teams!home_team_id(name),away_team:teams!away_team_id(name),home_player:players!home_player_id(name),away_player:players!away_player_id(name)")
       .eq("is_archived", false).eq("is_virtual", false).neq("match_kind", "future")
       .order("start_time", { ascending: false }).limit(300);
     setLinkableMatches(lm ?? []);
