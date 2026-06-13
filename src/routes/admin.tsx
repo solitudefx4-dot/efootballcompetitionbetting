@@ -1448,7 +1448,7 @@ function FuturesAdminPanel() {
     setTeams(tm ?? []);
     setPlayers(pl ?? []);
     const { data: lm } = await supabase.from("matches")
-      .select("id,name,home_score,away_score,status,home_team:teams!home_team_id(name),away_team:teams!away_team_id(name)")
+      .select("id,name,home_score,away_score,status,home_team:teams!home_team_id(name),away_team:teams!away_team_id(name),home_player:players!home_player_id(name),away_player:players!away_player_id(name)")
       .eq("is_archived", false).eq("is_virtual", false).neq("match_kind", "future")
       .order("start_time", { ascending: false }).limit(300);
     setLinkableMatches(lm ?? []);
@@ -1509,7 +1509,10 @@ function FuturesAdminPanel() {
     const lm = linkableMatches.find((m) => m.id === matchId);
     const cs = lm ? (side === "away" ? lm.away_score : lm.home_score) : null;
     const os = lm ? (side === "away" ? lm.home_score : lm.away_score) : null;
-    const opp = lm ? (side === "away" ? lm.home_team?.name : lm.away_team?.name) : null;
+    // Prefer the actual shooter/player name; fall back to the gang/team name.
+    const opp = lm ? (side === "away"
+      ? (lm.home_player?.name ?? lm.home_team?.name)
+      : (lm.away_player?.name ?? lm.away_team?.name)) : null;
     const ended = lm && ["ended", "completed", "settled"].includes(lm.status);
     await supabase.from("odds").update({
       future_match_id: matchId,
