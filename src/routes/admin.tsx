@@ -670,6 +670,7 @@ function UserEditDialog({ user, roles, onClose }: { user: any; roles: string[]; 
   async function saveProfile() {
     const { error } = await supabase.from("profiles").update({
       full_name: form.full_name, phone: form.phone, discord_username: form.discord_username,
+      discord_full_name: form.discord_full_name,
       country: form.country, gang_name: form.gang_name, gang_type: form.gang_type,
     }).eq("id", user.id);
     if (error) toast.error(error.message); else { toast.success("Saved"); logAudit("update_profile", "user", user.id); }
