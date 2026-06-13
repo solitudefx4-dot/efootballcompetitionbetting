@@ -3301,6 +3301,13 @@ function SettingsPanel() {
     const url = supabase.storage.from("ads").getPublicUrl(path).data.publicUrl;
     setS({ ...s, popup_ad_image: url });
   }
+  async function uploadInto(field: string, f: File) {
+    const path = `${field}-${Date.now()}-${f.name}`;
+    const { error } = await supabase.storage.from("ads").upload(path, f, { upsert: true });
+    if (error) { toast.error(error.message); return; }
+    const url = supabase.storage.from("ads").getPublicUrl(path).data.publicUrl;
+    setS({ ...s, [field]: url });
+  }
   return (
     <div className="grid lg:grid-cols-2 gap-4 max-w-5xl">
       <SettingsSection icon={Pause} title="Maintenance" subtitle="Block non-admin access and post a notice.">
@@ -3309,6 +3316,13 @@ function SettingsPanel() {
           <Switch checked={!!s.maintenance_mode} onCheckedChange={(v) => setS({ ...s, maintenance_mode: v })} />
         </div>
         <Textarea placeholder="Message shown to users" value={s.maintenance_message ?? ""} onChange={(e) => setS({ ...s, maintenance_message: e.target.value })} />
+        <FieldLuxe label="Banner image (optional)"><Input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadInto("maintenance_image", e.target.files[0])} /></FieldLuxe>
+        {s.maintenance_image && (
+          <div className="space-y-1">
+            <img src={s.maintenance_image} alt="" className="w-full max-h-40 object-contain rounded border border-border" />
+            <Button variant="ghost" size="sm" className="text-destructive h-7" onClick={() => setS({ ...s, maintenance_image: null })}>Remove image</Button>
+          </div>
+        )}
       </SettingsSection>
 
       <SettingsSection icon={Lock} title="Website Closed" subtitle="Fully close the site to non-admin visitors and post a notice.">
@@ -3317,6 +3331,13 @@ function SettingsPanel() {
           <Switch checked={!!s.closed_mode} onCheckedChange={(v) => setS({ ...s, closed_mode: v })} />
         </div>
         <Textarea placeholder="Message shown to users" value={s.closed_message ?? ""} onChange={(e) => setS({ ...s, closed_message: e.target.value })} />
+        <FieldLuxe label="Banner image (optional)"><Input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadInto("closed_image", e.target.files[0])} /></FieldLuxe>
+        {s.closed_image && (
+          <div className="space-y-1">
+            <img src={s.closed_image} alt="" className="w-full max-h-40 object-contain rounded border border-border" />
+            <Button variant="ghost" size="sm" className="text-destructive h-7" onClick={() => setS({ ...s, closed_image: null })}>Remove image</Button>
+          </div>
+        )}
       </SettingsSection>
 
       <SettingsSection icon={Coins} title="Betting Limits" subtitle="Stake and payout guardrails.">
