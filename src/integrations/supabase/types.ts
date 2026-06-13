@@ -1289,6 +1289,11 @@ export type Database = {
         Row: {
           future_candidate_type: string | null
           future_emblem_url: string | null
+          future_live_opponent: string | null
+          future_live_outcome: string | null
+          future_live_score: string | null
+          future_match_id: string | null
+          future_match_side: string | null
           future_next_at: string | null
           future_next_title: string | null
           future_progress: Json
@@ -1303,6 +1308,11 @@ export type Database = {
         Insert: {
           future_candidate_type?: string | null
           future_emblem_url?: string | null
+          future_live_opponent?: string | null
+          future_live_outcome?: string | null
+          future_live_score?: string | null
+          future_match_id?: string | null
+          future_match_side?: string | null
           future_next_at?: string | null
           future_next_title?: string | null
           future_progress?: Json
@@ -1317,6 +1327,11 @@ export type Database = {
         Update: {
           future_candidate_type?: string | null
           future_emblem_url?: string | null
+          future_live_opponent?: string | null
+          future_live_outcome?: string | null
+          future_live_score?: string | null
+          future_match_id?: string | null
+          future_match_side?: string | null
           future_next_at?: string | null
           future_next_title?: string | null
           future_progress?: Json
@@ -1329,6 +1344,20 @@ export type Database = {
           value?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "odds_future_match_id_fkey"
+            columns: ["future_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "odds_future_match_id_fkey"
+            columns: ["future_match_id"]
+            isOneToOne: false
+            referencedRelation: "public_real_matches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "odds_market_id_fkey"
             columns: ["market_id"]

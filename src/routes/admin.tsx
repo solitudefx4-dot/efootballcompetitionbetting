@@ -1423,12 +1423,13 @@ function FuturesAdminPanel() {
   const [futures, setFutures] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
   const [players, setPlayers] = useState<any[]>([]);
+  const [linkableMatches, setLinkableMatches] = useState<any[]>([]);
   const [draft, setDraft] = useState({ title: "Gang Champion of the Season", opens_at: new Date().toISOString().slice(0, 16), closes_at: "", options: "", min_stake: 1, max_payout: 100000000, max_selections: 1, next_title: "Round 1" });
 
   async function load() {
     const [{ data: s }, { data: f }, { data: tm }, { data: pl }] = await Promise.all([
       supabase.from("app_settings").select("futures_section_title,futures_min_stake,futures_max_payout,futures_max_selections").eq("id", 1).maybeSingle(),
-      supabase.from("matches").select("*, markets(id,name,is_open,odds(id,label,value,is_winner,market_id,future_candidate_type,future_emblem_url,future_status,future_next_title,future_next_at,future_progress))").eq("match_kind", "future").eq("is_archived", false).order("start_time", { ascending: false }),
+      supabase.from("matches").select("*, markets(id,name,is_open,odds(id,label,value,is_winner,market_id,future_candidate_type,future_emblem_url,future_status,future_next_title,future_next_at,future_progress,future_match_id,future_match_side,future_live_score,future_live_outcome,future_live_opponent))").eq("match_kind", "future").eq("is_archived", false).order("start_time", { ascending: false }),
       supabase.from("teams").select("id,name,logo_url,gang_type").order("name"),
       supabase.from("players").select("id,name,avatar_url,team_id,teams!team_id(name)").order("name"),
     ]);
@@ -1436,6 +1437,11 @@ function FuturesAdminPanel() {
     setFutures(f ?? []);
     setTeams(tm ?? []);
     setPlayers(pl ?? []);
+    const { data: lm } = await supabase.from("matches")
+      .select("id,name,home_score,away_score,status,home_team:teams!home_team_id(name),away_team:teams!away_team_id(name)")
+      .eq("is_archived", false).eq("is_virtual", false).neq("match_kind", "future")
+      .order("start_time", { ascending: false }).limit(300);
+    setLinkableMatches(lm ?? []);
   }
   useEffect(() => { load(); }, []);
 
@@ -1479,6 +1485,30 @@ function FuturesAdminPanel() {
   }
   async function updateOdd(oddId: string, value: number) {
     await supabase.from("odds").update({ value } as any).eq("id", oddId);
+    load();
+  }
+  // Link a contender (odd) to a real normal match. We immediately pull the current
+  // score so the admin sees it right away; the DB trigger keeps it in sync afterwards.
+  async function linkContenderMatch(odd: any, matchId: string, side: "home" | "away") {
+    if (!matchId) {
+      await supabase.from("odds").update({ future_match_id: null, future_match_side: null, future_live_score: null, future_live_outcome: null, future_live_opponent: null } as any).eq("id", odd.id);
+      toast.success("Unlinked from match");
+      load();
+      return;
+    }
+    const lm = linkableMatches.find((m) => m.id === matchId);
+    const cs = lm ? (side === "away" ? lm.away_score : lm.home_score) : null;
+    const os = lm ? (side === "away" ? lm.home_score : lm.away_score) : null;
+    const opp = lm ? (side === "away" ? lm.home_team?.name : lm.away_team?.name) : null;
+    const ended = lm && ["ended", "completed", "settled"].includes(lm.status);
+    await supabase.from("odds").update({
+      future_match_id: matchId,
+      future_match_side: side,
+      future_live_score: lm ? `${cs ?? 0}-${os ?? 0}` : null,
+      future_live_opponent: opp ?? null,
+      future_live_outcome: ended ? ((cs ?? 0) >= (os ?? 0) ? "won" : "lost") : "pending",
+    } as any).eq("id", odd.id);
+    toast.success("Linked — scores auto-update from this match");
     load();
   }
   async function updateFutureStatus(odd: any, status: string, opts: { score?: string; opponent?: string; at?: string } = {}) {
@@ -1567,7 +1597,7 @@ function FuturesAdminPanel() {
         {futures.map((f) => (
           <Card key={f.id} className="glass p-4 space-y-3">
             <div className="flex items-start gap-2"><div className="min-w-0 flex-1"><div className="font-bold text-lg truncate">{f.name}</div><div className="text-xs text-muted-foreground">Opens {f.lock_time ? new Date(f.lock_time).toLocaleString() : "now"} · Closes {new Date(f.start_time).toLocaleString()} · {f.status}</div></div><Button size="sm" className="btn-luxury" disabled={f.status === "ended"} onClick={() => finalizeFuture(f)}>Finalize</Button><Button size="sm" variant="destructive" onClick={() => archiveFuture(f.id)}><Trash2 className="h-3 w-3" /></Button></div>
-            {(f.markets ?? []).map((m: any) => <div key={m.id} className="grid grid-cols-2 md:grid-cols-3 gap-2">{(m.odds ?? []).map((o: any) => <FutureOddAdminCard key={o.id} odd={o} disabled={f.status === "ended"} onOdd={updateOdd} onStatus={updateFutureStatus} />)}</div>)}
+            {(f.markets ?? []).map((m: any) => <div key={m.id} className="grid grid-cols-2 md:grid-cols-3 gap-2">{(m.odds ?? []).map((o: any) => <FutureOddAdminCard key={o.id} odd={o} disabled={f.status === "ended"} onOdd={updateOdd} onStatus={updateFutureStatus} linkableMatches={linkableMatches} onLink={linkContenderMatch} />)}</div>)}
           </Card>
         ))}
       </div>
@@ -1575,11 +1605,12 @@ function FuturesAdminPanel() {
   );
 }
 
-function FutureOddAdminCard({ odd, disabled, onOdd, onStatus }: { odd: any; disabled: boolean; onOdd: (id: string, value: number) => void; onStatus: (odd: any, status: string, opts?: { score?: string; opponent?: string; at?: string }) => void }) {
+function FutureOddAdminCard({ odd, disabled, onOdd, onStatus, linkableMatches, onLink }: { odd: any; disabled: boolean; onOdd: (id: string, value: number) => void; onStatus: (odd: any, status: string, opts?: { score?: string; opponent?: string; at?: string }) => void; linkableMatches: any[]; onLink: (odd: any, matchId: string, side: "home" | "away") => void }) {
   const confirm = useConfirm();
   const [at, setAt] = useState(odd.future_next_at ? new Date(odd.future_next_at).toISOString().slice(0, 16) : "");
   const [score, setScore] = useState("");
   const [opponent, setOpponent] = useState("");
+  const [side, setSide] = useState<"home" | "away">(odd.future_match_side === "away" ? "away" : "home");
   const status = odd.future_status ?? "active";
   const progress = Array.isArray(odd.future_progress) ? odd.future_progress : [];
   const completed = progress.filter((p: any) => p && p.round != null).length;
@@ -1616,6 +1647,43 @@ function FutureOddAdminCard({ odd, disabled, onOdd, onStatus }: { odd: any; disa
         </div>
       </div>
       <Input className="h-8" type="number" step="0.01" value={Number(odd.value)} onChange={(e) => onOdd(odd.id, Number(e.target.value))} />
+      {!terminal && (
+        <div className="space-y-1 rounded-md border border-primary/15 bg-background/40 p-1.5">
+          <div className="text-[9px] uppercase tracking-wide text-muted-foreground">Link to a real match (auto-fills score)</div>
+          <div className="flex gap-1">
+            <Select value={odd.future_match_id ?? "none"} onValueChange={(v) => onLink(odd, v === "none" ? "" : v, side)}>
+              <SelectTrigger className="h-7 text-[10px]"><SelectValue placeholder="Pick match" /></SelectTrigger>
+              <SelectContent className="max-h-60">
+                <SelectItem value="none">— No linked match —</SelectItem>
+                {linkableMatches.map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-[10px]">
+                    {m.name || `${m.home_team?.name ?? "?"} v ${m.away_team?.name ?? "?"}`}{m.home_score != null ? ` (${m.home_score}-${m.away_score})` : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={side} onValueChange={(v) => { setSide(v as "home" | "away"); if (odd.future_match_id) onLink(odd, odd.future_match_id, v as "home" | "away"); }}>
+              <SelectTrigger className="h-7 w-20 text-[10px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="home" className="text-[10px]">Home</SelectItem>
+                <SelectItem value="away" className="text-[10px]">Away</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {odd.future_match_id && (
+            <div className="flex items-center justify-between gap-1 pt-0.5">
+              <span className="text-[10px] text-muted-foreground truncate">
+                Live: <span className="text-primary font-bold">{odd.future_live_score ?? "0-0"}</span>
+                {odd.future_live_opponent ? ` vs ${odd.future_live_opponent}` : ""}
+                {odd.future_live_outcome && odd.future_live_outcome !== "pending" ? ` · ${odd.future_live_outcome.toUpperCase()}` : ""}
+              </span>
+              {!disabled && (
+                <button type="button" className="text-[9px] underline text-primary shrink-0" onClick={() => { if (odd.future_live_score) setScore(odd.future_live_score); if (odd.future_live_opponent) setOpponent(odd.future_live_opponent); }}>Use score</button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       {!terminal && !disabled && (
         <>
           <Input className="h-8" value={score} onChange={(e) => setScore(e.target.value)} placeholder={`Round ${currentRound} score e.g. 21-15`} />
