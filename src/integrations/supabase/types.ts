@@ -101,7 +101,6 @@ export type Database = {
           id: number
           leaderboard_gangs_reset_at: string | null
           leaderboard_header_url: string | null
-          leaderboard_header_url: string | null
           leaderboard_shooters_reset_at: string | null
           maintenance_message: string | null
           maintenance_mode: boolean
@@ -182,7 +181,6 @@ export type Database = {
           id?: number
           leaderboard_gangs_reset_at?: string | null
           leaderboard_header_url?: string | null
-          leaderboard_header_url?: string | null
           leaderboard_shooters_reset_at?: string | null
           maintenance_message?: string | null
           maintenance_mode?: boolean
@@ -262,7 +260,6 @@ export type Database = {
           house_low_balance?: number
           id?: number
           leaderboard_gangs_reset_at?: string | null
-          leaderboard_header_url?: string | null
           leaderboard_header_url?: string | null
           leaderboard_shooters_reset_at?: string | null
           maintenance_message?: string | null
