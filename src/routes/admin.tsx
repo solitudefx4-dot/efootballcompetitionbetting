@@ -1509,10 +1509,7 @@ function FuturesAdminPanel() {
     const lm = linkableMatches.find((m) => m.id === matchId);
     const cs = lm ? (side === "away" ? lm.away_score : lm.home_score) : null;
     const os = lm ? (side === "away" ? lm.home_score : lm.away_score) : null;
-    // Prefer the actual shooter/player name; fall back to the gang/team name.
-    const opp = lm ? (side === "away"
-      ? (lm.home_player?.name ?? lm.home_team?.name)
-      : (lm.away_player?.name ?? lm.away_team?.name)) : null;
+    const opp = lm ? getLinkedOpponentName(lm, side) : null;
     const ended = lm && ["ended", "completed", "settled"].includes(lm.status);
     await supabase.from("odds").update({
       future_match_id: matchId,
@@ -1618,6 +1615,20 @@ function FuturesAdminPanel() {
   );
 }
 
+function getMatchSideName(match: any, side: "home" | "away") {
+  const playerName = side === "home" ? match?.home_player?.name : match?.away_player?.name;
+  const teamName = side === "home" ? match?.home_team?.name : match?.away_team?.name;
+  return playerName?.trim?.() || teamName?.trim?.() || (side === "home" ? "Home" : "Away");
+}
+
+function getLinkedOpponentName(match: any, side: "home" | "away") {
+  return getMatchSideName(match, side === "away" ? "home" : "away");
+}
+
+function getLinkableMatchLabel(match: any) {
+  return match?.name || `${getMatchSideName(match, "home")} v ${getMatchSideName(match, "away")}`;
+}
+
 function FutureOddAdminCard({ odd, disabled, onOdd, onStatus, linkableMatches, onLink }: { odd: any; disabled: boolean; onOdd: (id: string, value: number) => void; onStatus: (odd: any, status: string, opts?: { score?: string; opponent?: string; at?: string }) => void; linkableMatches: any[]; onLink: (odd: any, matchId: string, side: "home" | "away") => void }) {
   const confirm = useConfirm();
   const [at, setAt] = useState(odd.future_next_at ? new Date(odd.future_next_at).toISOString().slice(0, 16) : "");
@@ -1628,8 +1639,15 @@ function FutureOddAdminCard({ odd, disabled, onOdd, onStatus, linkableMatches, o
   const progress = Array.isArray(odd.future_progress) ? odd.future_progress : [];
   const completed = progress.filter((p: any) => p && p.round != null).length;
   const currentRound = completed + 1;
+  const linkedMatch = linkableMatches.find((m) => m.id === odd.future_match_id);
+  const linkedSide = odd.future_match_side === "away" ? "away" : "home";
+  const liveOpponent = linkedMatch ? getLinkedOpponentName(linkedMatch, linkedSide) : odd.future_live_opponent;
   // "lost" is NOT terminal — the contender stays in the event and advances a round.
   const terminal = ["disqualified", "settled", "winner"].includes(status);
+
+  useEffect(() => {
+    setSide(odd.future_match_side === "away" ? "away" : "home");
+  }, [odd.future_match_side]);
 
   async function act(next: string) {
     const title =
@@ -1670,7 +1688,7 @@ function FutureOddAdminCard({ odd, disabled, onOdd, onStatus, linkableMatches, o
                 <SelectItem value="none">— No linked match —</SelectItem>
                 {linkableMatches.map((m) => (
                   <SelectItem key={m.id} value={m.id} className="text-[10px]">
-                    {m.name || `${m.home_team?.name ?? "?"} v ${m.away_team?.name ?? "?"}`}{m.home_score != null ? ` (${m.home_score}-${m.away_score})` : ""}
+                    {getLinkableMatchLabel(m)}{m.home_score != null ? ` (${m.home_score}-${m.away_score})` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1687,11 +1705,11 @@ function FutureOddAdminCard({ odd, disabled, onOdd, onStatus, linkableMatches, o
             <div className="flex items-center justify-between gap-1 pt-0.5">
               <span className="text-[10px] text-muted-foreground truncate">
                 Live: <span className="text-primary font-bold">{odd.future_live_score ?? "0-0"}</span>
-                {odd.future_live_opponent ? ` vs ${odd.future_live_opponent}` : ""}
+                {liveOpponent ? ` vs ${liveOpponent}` : ""}
                 {odd.future_live_outcome && odd.future_live_outcome !== "pending" ? ` · ${odd.future_live_outcome.toUpperCase()}` : ""}
               </span>
               {!disabled && (
-                <button type="button" className="text-[9px] underline text-primary shrink-0" onClick={() => { if (odd.future_live_score) setScore(odd.future_live_score); if (odd.future_live_opponent) setOpponent(odd.future_live_opponent); }}>Use score</button>
+                <button type="button" className="text-[9px] underline text-primary shrink-0" onClick={() => { if (odd.future_live_score) setScore(odd.future_live_score); if (liveOpponent) setOpponent(liveOpponent); }}>Use score</button>
               )}
             </div>
           )}
