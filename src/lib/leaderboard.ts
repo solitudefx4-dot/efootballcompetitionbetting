@@ -74,8 +74,11 @@ export async function loadStandings(): Promise<Standings> {
       if (!countForShooters) return;
       const draw = Number(m.home_score ?? 0) === Number(m.away_score ?? 0);
       const winnerPlayerId = draw ? null : Number(m.home_score ?? 0) > Number(m.away_score ?? 0) ? m.home_player_id : m.away_player_id;
-      const sides: Array<[string | null, boolean]> = [[m.home_player_id, homePresent], [m.away_player_id, awayPresent]];
-      for (const [pid, present] of sides) {
+      const sides: Array<[string | null, boolean, number]> = [
+        [m.home_player_id, homePresent, Number(m.home_score ?? 0)],
+        [m.away_player_id, awayPresent, Number(m.away_score ?? 0)],
+      ];
+      for (const [pid, present, kills] of sides) {
         if (!present) continue;
         const pl = pid ? playerMap.get(pid) : null;
         if (!pl?.name) continue;
@@ -83,16 +86,20 @@ export async function loadStandings(): Promise<Standings> {
         const pc = playerAgg.get(pl.name) ?? { name: pl.name, gang_faction: tname, TS: 0, W: 0, L: 0, D: 0, PTS: 0, P: 0 };
         pc.gang_faction = tname;
         pc.P += 1;
-        if (draw) { pc.D += 1; pc.PTS += 1; pc.TS += 1; }
-        else if (winnerPlayerId === pid) { pc.W += 1; pc.PTS += 3; pc.TS += 3; }
+        pc.TS += kills; // total kills scored in this match
+        if (draw) { pc.D += 1; pc.PTS += 1; }
+        else if (winnerPlayerId === pid) { pc.W += 1; pc.PTS += 3; }
         else { pc.L += 1; }
         playerAgg.set(pl.name, pc);
       }
       return;
     }
 
-    const sides: Array<["home" | "away", boolean]> = [["home", homePresent], ["away", awayPresent]];
-    for (const [side, present] of sides) {
+    const sides: Array<["home" | "away", boolean, number]> = [
+      ["home", homePresent, Number(m.home_score ?? 0)],
+      ["away", awayPresent, Number(m.away_score ?? 0)],
+    ];
+    for (const [side, present, teamScore] of sides) {
       if (!present) continue;
       const tid = side === "home" ? m.home_team_id : m.away_team_id;
       const tname = teamMap.get(tid) || "Team";
@@ -101,8 +108,9 @@ export async function loadStandings(): Promise<Standings> {
       if (countForGangs) {
         const cur = gangAgg.get(tname) ?? { name: tname, top_player: (teamPlayers.get(tid) ?? [])[0], TS: 0, W: 0, L: 0, D: 0, PTS: 0, P: 0 };
         cur.P += 1;
-        if (draw) { cur.D += 1; cur.PTS += 1; cur.TS += 1; }
-        else if (won) { cur.W += 1; cur.PTS += 3; cur.TS += 3; }
+        cur.TS += teamScore; // total kills scored by the gang in this match
+        if (draw) { cur.D += 1; cur.PTS += 1; }
+        else if (won) { cur.W += 1; cur.PTS += 3; }
         else { cur.L += 1; }
         gangAgg.set(tname, cur);
       }
@@ -111,8 +119,9 @@ export async function loadStandings(): Promise<Standings> {
           const pc = playerAgg.get(pname) ?? { name: pname, gang_faction: tname, TS: 0, W: 0, L: 0, D: 0, PTS: 0, P: 0 };
           pc.gang_faction = pc.gang_faction || tname;
           pc.P += 1;
-          if (draw) { pc.D += 1; pc.PTS += 1; pc.TS += 1; }
-          else if (won) { pc.W += 1; pc.PTS += 3; pc.TS += 3; }
+          pc.TS += teamScore;
+          if (draw) { pc.D += 1; pc.PTS += 1; }
+          else if (won) { pc.W += 1; pc.PTS += 3; }
           else { pc.L += 1; }
           playerAgg.set(pname, pc);
         });
