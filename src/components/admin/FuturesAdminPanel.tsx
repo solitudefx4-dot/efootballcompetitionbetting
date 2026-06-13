@@ -21,6 +21,7 @@ function FuturesAdminPanel() {
   const [players, setPlayers] = useState<any[]>([]);
   const [settings, setSettings] = useState({ futures_section_title: "TOURNAMENT FUTURES", futures_min_stake: 1, futures_max_payout: 100000000, futures_max_selections: 1 });
   const [draft, setDraft] = useState({ title: "Gang Champion of the Season", next_title: "Round 1", opens_at: "", closes_at: "", options: "", min_stake: 1, max_payout: 100000000, max_selections: 1 });
+  const [restrictRepeat, setRestrictRepeat] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // Search state
 
   // Filter players and teams by search query
