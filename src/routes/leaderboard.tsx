@@ -89,7 +89,7 @@ function Page() {
             <img src={headerUrl} alt="Lomita Shooters League Leaderboard" className="w-full h-auto block" />
           </div>
         ) : (
-          <div className="relative mb-6 rounded-2xl overflow-hidden glass-ice border-2 border-amber-400/60 shadow-[0_0_40px_-10px_rgba(212,175,55,0.55)]">
+          <div className="relative mb-6 rounded-2xl overflow-hidden bg-black/20 backdrop-blur-[2px] border-2 border-amber-400/60 shadow-[0_0_40px_-10px_rgba(212,175,55,0.55)]">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent" />
             <div className="relative flex items-center gap-3 px-5 py-5">
               <span className="grid place-items-center h-12 w-12 rounded-xl border border-amber-400/40 bg-black/40 shadow-[0_0_20px_-4px_rgba(212,175,55,0.6)]">
@@ -101,7 +101,7 @@ function Page() {
         )}
 
         <Tabs defaultValue="gangs">
-          <TabsList className="bg-card/40 backdrop-blur-xl border border-primary/20">
+          <TabsList className="bg-black/25 backdrop-blur-[2px] border border-amber-400/40">
             <TabsTrigger value="gangs">Top Gangs / Factions</TabsTrigger>
             <TabsTrigger value="shooters">Top Shooters</TabsTrigger>
           </TabsList>
