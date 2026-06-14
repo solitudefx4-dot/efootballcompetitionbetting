@@ -3797,7 +3797,7 @@ function LeaderboardAdminPanel() {
         </div>
       </Card>
 
-      <Card className="glass-strong p-3 flex flex-wrap items-center gap-2 border-destructive/40">
+      <Card className="glass-ice p-3 flex flex-wrap items-center gap-2 border-destructive/40">
         <div className="text-xs font-bold tracking-widest text-destructive mr-1">DANGER ZONE</div>
         <Button variant="destructive" size="sm" onClick={clearAll}><Trash2 className="h-3 w-3 mr-1" />Wipe Leaderboard</Button>
         <Button variant="destructive" size="sm" onClick={() => wipeKind("shooter", "Shooters")}><Trash2 className="h-3 w-3 mr-1" />Wipe Shooters</Button>
@@ -3813,10 +3813,10 @@ function LeaderboardAdminPanel() {
         <span className="text-[11px] text-muted-foreground ml-auto">{rows.length} entries</span>
       </div>
 
-      <Card className="glass-strong p-0 overflow-x-auto">
+      <Card className="glass-ice p-0 overflow-x-auto">
         <table className="w-full text-xs min-w-[860px]">
           <thead>
-            <tr className="text-left uppercase tracking-widest text-muted-foreground border-b border-border bg-card/40">
+            <tr className="text-left uppercase tracking-widest text-muted-foreground border-b border-border bg-card/20">
               <th className="px-2 py-2">Pos</th>
               <th className="px-2 py-2">{tab === "gang" ? "Gang / Faction" : "Player"}</th>
               <th className="px-2 py-2">{tab === "gang" ? "Top Player" : "Gang & Faction"}</th>
