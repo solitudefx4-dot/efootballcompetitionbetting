@@ -3782,10 +3782,10 @@ function LeaderboardAdminPanel() {
 
   return (
     <div className="space-y-3">
-      <Card className="glass-strong p-3 space-y-2 border-amber-500/40">
+      <Card className="glass-ice p-3 space-y-2 border-amber-500/40">
         <div className="text-xs font-bold tracking-widest text-amber-300">LEADERBOARD HEADER IMAGE</div>
         <p className="text-[10px] text-muted-foreground">Shown at the top of the public Leaderboard page instead of the plain title. Upload a banner or paste an image URL.</p>
-        {headerUrl && <img src={headerUrl} alt="Leaderboard header" className="w-full max-h-28 object-contain rounded-lg border border-amber-500/30 bg-black/30" />}
+        {headerUrl && <img src={headerUrl} alt="Leaderboard header" className="w-full max-h-28 object-contain rounded-lg border border-amber-500/30 bg-black/20" />}
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex">
             <input type="file" accept="image/*" className="hidden" disabled={headerBusy} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadHeader(f); }} />
