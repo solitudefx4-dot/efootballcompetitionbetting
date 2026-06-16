@@ -208,6 +208,7 @@ function AdminPage() {
             <TabsContent value="attendance" className="mt-4"><AttendancePanel /></TabsContent>
           </Tabs>
         </div>
+        <ActionConfirmDialog />
       </main>
     </Layout>
   );
@@ -233,6 +234,7 @@ async function logAudit(action: string, target_type: string, target_id?: string,
     _metadata: enriched,
   });
   if (error) console.warn("audit log failed", error.message);
+  else if (!SILENT_AUDIT_ACTIONS.has(action)) notifyAction("Action saved", humanizeAction(action));
 }
 
 function AdminTab({ icon: Icon, label, count = 0 }: { icon: any; label: string; count?: number }) {
