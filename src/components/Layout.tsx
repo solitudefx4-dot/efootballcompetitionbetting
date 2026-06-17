@@ -195,7 +195,7 @@ function SiteFooter() {
     <footer className="border-t border-border mt-20 backdrop-blur-xl bg-card/40 lg:pl-0 pl-16">
       <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-6 text-sm">
         <div>
-          <div className="flex items-center gap-2 mb-2"><GangLogo size={28} withGlow={false} /><span className="font-bold tracking-widest gradient-gold-text">LOMITA SHOOTERS LEAGUE</span></div>
+          <div className="flex items-center gap-2 mb-2"><GangLogo size={28} withGlow={false} /><span className="font-bold tracking-widest gradient-gold-text uppercase">{s?.site_name || "LOMITA SHOOTERS LEAGUE"}</span></div>
           <p className="text-muted-foreground text-xs">Virtual token-only platform · No real money gambling.</p>
         </div>
         <div>
