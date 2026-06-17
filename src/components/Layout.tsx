@@ -88,8 +88,14 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           <Link to="/" className="flex items-center gap-2 group shrink-0">
             <GangLogo size={38} className="transition-transform group-hover:scale-105 group-hover:rotate-3 duration-300" />
             <div className="leading-tight">
-              <div className="text-sm font-extrabold tracking-[0.25em] gradient-gold-text">LOMITA</div>
-              <div className="text-[9px] text-muted-foreground tracking-[0.35em]">SHOOTERS LEAGUE</div>
+              {siteName ? (
+                <div className="text-sm font-extrabold tracking-[0.18em] gradient-gold-text uppercase max-w-[160px] truncate">{siteName}</div>
+              ) : (
+                <>
+                  <div className="text-sm font-extrabold tracking-[0.25em] gradient-gold-text">LOMITA</div>
+                  <div className="text-[9px] text-muted-foreground tracking-[0.35em]">SHOOTERS LEAGUE</div>
+                </>
+              )}
             </div>
           </Link>
           <nav className="hidden lg:flex flex-1 items-center justify-center gap-1 flex-nowrap">
