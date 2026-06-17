@@ -68,9 +68,15 @@ export function AdminPage() {
   const [alerts, setAlerts] = useState<Record<string, number>>({});
   // Admin-configurable console header image (falls back to bundled seed art).
   const [heroBg, setHeroBg] = useState<string | null>(null);
+  const [heroFit, setHeroFit] = useState<string>("cover");
+  const [heroPos, setHeroPos] = useState<string>("center right");
   useEffect(() => {
-    supabase.from("app_settings").select("admin_hero_url").eq("id", 1).maybeSingle()
-      .then(({ data }) => setHeroBg((data as any)?.admin_hero_url ?? null));
+    supabase.from("app_settings").select("admin_hero_url,admin_hero_fit,admin_hero_position").eq("id", 1).maybeSingle()
+      .then(({ data }) => {
+        setHeroBg((data as any)?.admin_hero_url ?? null);
+        setHeroFit((data as any)?.admin_hero_fit ?? "cover");
+        setHeroPos((data as any)?.admin_hero_position ?? "center right");
+      });
   }, []);
   // Toggle the frosted-glass blur on the whole console so admins can verify
   // sensitive data alignment/layout against a clean, unblurred surface.
