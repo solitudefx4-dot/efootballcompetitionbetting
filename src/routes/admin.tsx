@@ -3543,6 +3543,7 @@ function SettingsPanel() {
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="large">Large</SelectItem>
               <SelectItem value="xl">Extra Large</SelectItem>
+              <SelectItem value="full">Full screen (covers home page)</SelectItem>
             </SelectContent>
           </Select>
         </FieldLuxe>
