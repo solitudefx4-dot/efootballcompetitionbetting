@@ -262,9 +262,29 @@ function FuturesSection({ title, markets, maxSelections }: { title: string; mark
   const { selections, add, remove, setOpen } = useBetSlip();
   return (
     <section className="container mt-10">
-      <div className="flex items-end justify-between gap-3 mb-4">
-        <SectionHeader icon={Trophy} title={title} subtitle={`Season-long markets · pick up to ${maxSelections} contender${maxSelections === 1 ? "" : "s"}.`} />
-        <Badge variant="outline" className="border-accent/40 text-accent">Seasonal</Badge>
+      <div className="seasonal-golden relative overflow-hidden rounded-3xl mb-5 px-5 py-6 md:px-8 md:py-8">
+        <div className="pointer-events-none absolute -right-10 -top-10 opacity-25">
+          <Trophy className="h-44 w-44 text-amber-200" />
+        </div>
+        <div className="pointer-events-none absolute inset-0 seasonal-golden-shine" />
+        <div className="relative flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-black/30 backdrop-blur px-3 py-1 text-[10px] uppercase tracking-[0.32em] font-black text-amber-100">
+              <Trophy className="h-3.5 w-3.5" /> Seasonal Tournament
+            </div>
+            <h2 className="mt-2 font-display text-3xl md:text-5xl font-black uppercase tracking-tight seasonal-golden-title">
+              {title}
+            </h2>
+            <p className="mt-1 text-sm md:text-base font-semibold text-amber-50/90">
+              Season-long markets · pick up to {maxSelections} contender{maxSelections === 1 ? "" : "s"}.
+            </p>
+          </div>
+          <Link to="/tournament">
+            <Button className="seasonal-golden-btn font-black tracking-wide">
+              Go to Tournament <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        </div>
       </div>
       {markets.length === 0 && (
         <Card className="glass-strong p-5 border-accent/30">
