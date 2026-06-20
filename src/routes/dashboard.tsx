@@ -34,6 +34,8 @@ function Dashboard() {
   const [bets, setBets] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [promoOpen, setPromoOpen] = useState(false);
+  const [betFilter, setBetFilter] = useState<string>("all");
+  const [betSearch, setBetSearch] = useState("");
   const isSponsor = roles?.includes("sponsor") || roles?.includes("admin");
   useEffect(() => {
     if (!user) return;
