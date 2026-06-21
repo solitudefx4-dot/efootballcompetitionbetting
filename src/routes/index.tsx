@@ -16,6 +16,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from "embla-carousel-autoplay";
 import { Crosshair, Flame, Trophy, ChevronRight, Skull, Coins, Ticket as TicketIcon, ClipboardPaste, X } from "lucide-react";
 import { Countdown } from "@/components/Countdown";
+import { TeamLogo } from "@/components/TeamLogo";
 import hero from "@/assets/hero.jpg";
 import { fetchMatches, fetchSettings, type MatchRow } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
