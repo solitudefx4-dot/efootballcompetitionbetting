@@ -99,6 +99,9 @@ export type Database = {
           gift_max_per_tx: number
           gift_min_amount: number
           hall_of_fame_reset_at: string | null
+          hero_bg_fit: string
+          hero_bg_position: string
+          hero_bg_url: string | null
           hero_subtitle: string | null
           hero_tagline: string | null
           hero_title: string | null
@@ -191,6 +194,9 @@ export type Database = {
           gift_max_per_tx?: number
           gift_min_amount?: number
           hall_of_fame_reset_at?: string | null
+          hero_bg_fit?: string
+          hero_bg_position?: string
+          hero_bg_url?: string | null
           hero_subtitle?: string | null
           hero_tagline?: string | null
           hero_title?: string | null
@@ -283,6 +289,9 @@ export type Database = {
           gift_max_per_tx?: number
           gift_min_amount?: number
           hall_of_fame_reset_at?: string | null
+          hero_bg_fit?: string
+          hero_bg_position?: string
+          hero_bg_url?: string | null
           hero_subtitle?: string | null
           hero_tagline?: string | null
           hero_title?: string | null
@@ -1477,6 +1486,7 @@ export type Database = {
           restrict_reason: string | null
           server: string | null
           showcase_achievement_ids: string[]
+          special_id: string | null
           streak_days: number
           token_balance: number
           updated_at: string
@@ -1515,6 +1525,7 @@ export type Database = {
           restrict_reason?: string | null
           server?: string | null
           showcase_achievement_ids?: string[]
+          special_id?: string | null
           streak_days?: number
           token_balance?: number
           updated_at?: string
@@ -1553,6 +1564,7 @@ export type Database = {
           restrict_reason?: string | null
           server?: string | null
           showcase_achievement_ids?: string[]
+          special_id?: string | null
           streak_days?: number
           token_balance?: number
           updated_at?: string
@@ -3082,6 +3094,7 @@ export type Database = {
           type: string
         }[]
       }
+      gen_special_id: { Args: never; Returns: string }
       get_display_roles: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
@@ -3128,6 +3141,14 @@ export type Database = {
       recalc_vip_tier: { Args: { _user_id: string }; Returns: string }
       redeem_promo_code: { Args: { _code: string }; Returns: Json }
       redeem_referral_code: { Args: { _code: string }; Returns: Json }
+      resolve_special_id: {
+        Args: { _special_id: string }
+        Returns: {
+          full_name: string
+          id: string
+          special_id: string
+        }[]
+      }
       resolve_virtual_round: {
         Args: {
           _away_score?: number
@@ -3158,6 +3179,10 @@ export type Database = {
         Returns: Json
       }
       settle_pay_winning_bet: { Args: { _bet_id: string }; Returns: Json }
+      transfer_tokens: {
+        Args: { _amount: number; _recipient_special_id: string }
+        Returns: Json
+      }
       user_cashout_bet: { Args: { _bet_id: string }; Returns: Json }
       verify_xp_consistency: { Args: { _user_id?: string }; Returns: Json }
       virtual_half_score_for_match: {

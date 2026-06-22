@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Ticket as TicketIcon, ChevronRight, Wallet, UserCog, CreditCard, Coins, Tag, Trophy, ListChecks, Sparkles, Lock, History as HistoryIcon } from "lucide-react";
+import { Ticket as TicketIcon, ChevronRight, Wallet, UserCog, CreditCard, Coins, Tag, Trophy, ListChecks, Sparkles, Lock, History as HistoryIcon, ArrowLeftRight } from "lucide-react";
 import { ChallengesPanel } from "@/components/ChallengesPanel";
 import { VipCard } from "@/components/UserHubSections";
 
@@ -30,10 +30,11 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
-  const { user, profile, roles } = useAuth();
+  const { user, profile, roles, refresh } = useAuth();
   const [bets, setBets] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [promoOpen, setPromoOpen] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
   const [betFilter, setBetFilter] = useState<string>("all");
   const [betSearch, setBetSearch] = useState("");
   const isSponsor = roles?.includes("sponsor") || roles?.includes("admin");
@@ -86,7 +87,7 @@ function Dashboard() {
           <PanelCard to="#bets" icon={TicketIcon} title="Bet Slips" subtitle={`${bets.length} total`} />
           <PanelCard to="/profile" icon={UserCog} title="Edit Profile" subtitle="Update details" />
           <PanelCard to="/withdraw" icon={Wallet} title="Withdrawal" subtitle="Cash out tokens" />
-          <PanelCard icon={CreditCard} title="Deposit" subtitle="Coming soon" comingSoon />
+          <PanelCard onClick={() => setTransferOpen(true)} icon={ArrowLeftRight} title="Transfer Tokens" subtitle="Send to a user ID" />
           <PanelCard to="/checkout" icon={Coins} title="Request Tokens" subtitle="Top up balance" />
           {isSponsor && (
             <PanelCard onClick={() => setPromoOpen(true)} icon={Tag} title="Promo Codes" subtitle="Sponsor only" gold />
@@ -215,6 +216,7 @@ function Dashboard() {
         </div>
       </div>
       <PromoRequestDialog open={promoOpen} onClose={() => setPromoOpen(false)} userId={user.id} />
+      <TransferDialog open={transferOpen} onClose={() => setTransferOpen(false)} onDone={refresh} />
     </Layout>
   );
 }
@@ -245,6 +247,66 @@ function PanelCard({ to, onClick, icon: Icon, title, subtitle, comingSoon, gold 
   if (to && to.startsWith("#")) return <a href={to}>{inner}</a>;
   if (to) return <Link to={to}>{inner}</Link>;
   return <button type="button" onClick={onClick} className="text-left">{inner}</button>;
+}
+
+function TransferDialog({ open, onClose, onDone }: { open: boolean; onClose: () => void; onDone: () => void }) {
+  const [specialId, setSpecialId] = useState("");
+  const [amount, setAmount] = useState(1_000_000);
+  const [recipient, setRecipient] = useState<{ full_name: string; special_id: string } | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function lookup() {
+    const id = specialId.trim();
+    if (!id) return toast.error("Enter a Special ID");
+    setChecking(true);
+    const { data, error } = await (supabase.rpc as any)("resolve_special_id", { _special_id: id });
+    setChecking(false);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row) { setRecipient(null); return toast.error("No user found with that Special ID"); }
+    setRecipient({ full_name: row.full_name, special_id: row.special_id });
+  }
+
+  async function submit() {
+    if (!recipient) return toast.error("Confirm the recipient first");
+    if (amount <= 0) return toast.error("Enter a valid amount");
+    setSubmitting(true);
+    const { data, error } = await (supabase.rpc as any)("transfer_tokens", { _recipient_special_id: recipient.special_id, _amount: amount });
+    setSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Sent ${amount.toLocaleString()} tokens to ${recipient.full_name}`);
+    setSpecialId(""); setRecipient(null); setAmount(1_000_000);
+    onDone();
+    onClose();
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="glass-strong border-primary/30 max-w-md backdrop-blur-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><Coins className="h-5 w-5 text-primary" />Transfer Tokens</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">Recipient Special ID</label>
+            <div className="flex gap-2">
+              <Input value={specialId} onChange={(e) => { setSpecialId(e.target.value.toUpperCase()); setRecipient(null); }} placeholder="e.g. XHA6HD8" />
+              <Button variant="outline" onClick={lookup} disabled={checking}>{checking ? "…" : "Check"}</Button>
+            </div>
+            {recipient && <p className="text-xs text-emerald-300 mt-1">Sending to: <span className="font-bold">{recipient.full_name}</span></p>}
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">Amount</label>
+            <Input type="number" min={1} value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
+            <Button onClick={submit} disabled={submitting || !recipient} className="flex-1 btn-luxury">{submitting ? "Sending…" : "Send Tokens"}</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function PromoRequestDialog({ open, onClose, userId }: { open: boolean; onClose: () => void; userId: string }) {
