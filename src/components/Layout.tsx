@@ -187,6 +187,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           {railOpen && <>
           <MobLink to="/matches" icon={MatchIcon} label="Matches" />
           <MobLink to="/virtual" icon={Dice5} label="Virtual" />
+          <MobLink to="/lottery" icon={Dice5} label="Lottery" />
           <MobLink to="/leaderboard" icon={Trophy} label="Top" />
           <MobLink to="/tournament" icon={Swords} label="Bracket" />
           {user && <>
