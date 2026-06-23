@@ -48,6 +48,7 @@ import { SpotlightsAdminPanel } from "@/components/Spotlight";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ImageSettingControl } from "@/components/admin/ImageSettingControl";
 import { ClansAdminPanel } from "@/components/admin/ClansAdminPanel";
+import { LotteryAdminPanel } from "@/components/admin/LotteryAdminPanel";
 import { TopBetsPanel } from "@/components/admin/TopBetsPanel";
 import { TournamentAdminPanel } from "@/components/admin/TournamentAdminPanel";
 import { seedLegacyUsers } from "@/lib/seed-users.functions";
