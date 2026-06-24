@@ -218,6 +218,8 @@ function Dashboard() {
             </Card>
           ))}
         </div>
+
+        <TransactionRecords />
       </div>
       <PromoRequestDialog open={promoOpen} onClose={() => setPromoOpen(false)} userId={user.id} />
       <TransferDialog open={transferOpen} onClose={() => setTransferOpen(false)} onDone={refresh} />
