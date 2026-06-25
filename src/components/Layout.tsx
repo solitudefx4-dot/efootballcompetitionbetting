@@ -7,6 +7,7 @@ import { useAuth, ROLE_COLORS, ROLE_LABELS } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LevelUpModal } from "@/components/Spotlight";
 import { GlobalWinAnimation } from "@/components/GlobalWinAnimation";
+import { BetSuccessPopout } from "@/components/BetSuccessPopout";
 import { ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation } from "@tanstack/react-router";
