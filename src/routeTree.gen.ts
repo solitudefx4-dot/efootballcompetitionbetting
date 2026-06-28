@@ -22,6 +22,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PollsRouteImport } from './routes/polls'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ModRouteImport } from './routes/mod'
 import { Route as MatchesRouteImport } from './routes/matches'
@@ -107,6 +108,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PollsRoute = PollsRouteImport.update({
+  id: '/polls',
+  path: '/polls',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRouteWithChildren
   '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
+  '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/matches': typeof MatchesRouteWithChildren
   '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
+  '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRouteWithChildren
   '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
+  '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mod'
     | '/notifications'
+    | '/polls'
     | '/profile'
     | '/register'
     | '/reset-password'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mod'
     | '/notifications'
+    | '/polls'
     | '/profile'
     | '/register'
     | '/reset-password'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/mod'
     | '/notifications'
+    | '/polls'
     | '/profile'
     | '/register'
     | '/reset-password'
@@ -452,6 +464,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRouteWithChildren
   ModRoute: typeof ModRoute
   NotificationsRoute: typeof NotificationsRoute
+  PollsRoute: typeof PollsRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -561,6 +574,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/polls': {
+      id: '/polls'
+      path: '/polls'
+      fullPath: '/polls'
+      preLoaderRoute: typeof PollsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -752,6 +772,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRouteWithChildren,
   ModRoute: ModRoute,
   NotificationsRoute: NotificationsRoute,
+  PollsRoute: PollsRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
