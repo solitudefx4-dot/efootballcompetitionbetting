@@ -221,6 +221,7 @@ export function AdminPage() {
             <TabsContent value="reports" className="mt-4"><ReportsPanel /></TabsContent>
             <TabsContent value="tokenrules" className="mt-4"><TokenRulesPanel /></TabsContent>
             <TabsContent value="broadcast" className="mt-4"><BroadcastPanel /></TabsContent>
+            <TabsContent value="pushblast" className="mt-4"><PushBroadcastPanel /></TabsContent>
             <TabsContent value="activity" className="mt-4"><ActivityPanel /></TabsContent>
             <TabsContent value="streakpush" className="mt-4"><StreakAndPushPanel /></TabsContent>
             <TabsContent value="referrals" className="mt-4"><ReferralsAdminPanel /></TabsContent>
