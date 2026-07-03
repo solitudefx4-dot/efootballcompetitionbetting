@@ -17,7 +17,7 @@ import {
   Shield, Users, Trophy, Coins, Megaphone, Settings as SettingsIcon, Ticket, AlertTriangle,
   Calendar, Tag, Image as ImageIcon, BarChart3, History, Send, Plus, Trash2, Pencil, ChevronRight, ChevronLeft, Wallet, ListOrdered, Sparkles, ClipboardList, Lock, Pause, Play, Check, X, MessageSquare, Eye, RotateCw, Copy, Globe, MapPin, Smartphone, Clock, Filter,
   Dice5, LogOut, Crosshair, Target, Flame, ThumbsUp, ThumbsDown,
-  Gift, BellRing,
+  Gift, BellRing, GalleryHorizontalEnd, Gamepad2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import lslLogo from "@/assets/lsl-logo.png";
@@ -53,6 +53,9 @@ import { LotteryAdminPanel } from "@/components/admin/LotteryAdminPanel";
 import { GiftsSpinAdminPanel } from "@/components/admin/GiftsSpinAdminPanel";
 import { SurveysAdminPanel } from "@/components/admin/SurveysAdminPanel";
 import { PushBroadcastPanel } from "@/components/admin/PushBroadcastPanel";
+import { HomeBannersAdminPanel } from "@/components/admin/HomeBannersAdminPanel";
+import { ArcadeAdminPanel } from "@/components/admin/ArcadeAdminPanel";
+import { CasinoHistoryPanel } from "@/components/admin/CasinoHistoryPanel";
 import { TopBetsPanel } from "@/components/admin/TopBetsPanel";
 import { TournamentAdminPanel } from "@/components/admin/TournamentAdminPanel";
 import { seedLegacyUsers } from "@/lib/seed-users.functions";
@@ -222,6 +225,9 @@ export function AdminPage() {
             <TabsContent value="tokenrules" className="mt-4"><TokenRulesPanel /></TabsContent>
             <TabsContent value="broadcast" className="mt-4"><BroadcastPanel /></TabsContent>
             <TabsContent value="pushblast" className="mt-4"><PushBroadcastPanel /></TabsContent>
+            <TabsContent value="banners" className="mt-4"><HomeBannersAdminPanel /></TabsContent>
+            <TabsContent value="arcade" className="mt-4"><ArcadeAdminPanel /></TabsContent>
+            <TabsContent value="casinohistory" className="mt-4"><CasinoHistoryPanel /></TabsContent>
             <TabsContent value="activity" className="mt-4"><ActivityPanel /></TabsContent>
             <TabsContent value="streakpush" className="mt-4"><StreakAndPushPanel /></TabsContent>
             <TabsContent value="referrals" className="mt-4"><ReferralsAdminPanel /></TabsContent>
@@ -3309,6 +3315,9 @@ const QUICK_ACTIONS: { i: any; l: string; t: string }[] = [
   { i: Eye, l: "Attendance", t: "attendance" },
   { i: Send, l: "Broadcast", t: "broadcast" },
   { i: BellRing, l: "Push Blast", t: "pushblast" },
+  { i: GalleryHorizontalEnd, l: "Home Banners", t: "banners" },
+  { i: Gamepad2, l: "Arcade", t: "arcade" },
+  { i: History, l: "Casino History", t: "casinohistory" },
   { i: Sparkles, l: "Challenges", t: "challenges" },
   { i: MessageSquare, l: "Chat", t: "chat" },
   { i: Megaphone, l: "Content", t: "content" },

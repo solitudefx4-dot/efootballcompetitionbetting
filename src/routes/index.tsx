@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { MatchCardLive } from "@/components/MatchCardLive";
 import { EventBanner } from "@/components/EventBanner";
 import { AnnouncementSlider, HighlightsRow, AdsRow } from "@/components/HomeContent";
+import { HomeBannerSlider } from "@/components/HomeBannerSlider";
 import { GrandPrizeWinners } from "@/components/GrandPrizeWinners";
 import { HotBets } from "@/components/HotBets";
 import { SeasonBanner } from "@/components/SeasonBanner";
@@ -93,6 +94,7 @@ function Index() {
 
   return (
     <Layout>
+      <HomeBannerSlider />
       <section className="relative overflow-hidden">
         {settings?.hero_bg_url && (
           <img

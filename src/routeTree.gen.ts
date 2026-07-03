@@ -47,6 +47,7 @@ import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 import { Route as ApiPublicVirtualTickRouteImport } from './routes/api/public/virtual-tick'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks/send-push'
 import { Route as ApiPublicHooksProcessScheduledPushRouteImport } from './routes/api/public/hooks/process-scheduled-push'
+import { Route as ApiPublicHooksBroadcastPushRouteImport } from './routes/api/public/hooks/broadcast-push'
 
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
@@ -239,6 +240,12 @@ const ApiPublicHooksProcessScheduledPushRoute =
     path: '/api/public/hooks/process-scheduled-push',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBroadcastPushRoute =
+  ApiPublicHooksBroadcastPushRouteImport.update({
+    id: '/api/public/hooks/broadcast-push',
+    path: '/api/public/hooks/broadcast-push',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -277,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
@@ -317,6 +325,7 @@ export interface FileRoutesByTo {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
@@ -358,6 +367,7 @@ export interface FileRoutesById {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   fileRoutesByTo: FileRoutesByTo
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   id:
@@ -480,6 +492,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   fileRoutesById: FileRoutesById
@@ -519,6 +532,7 @@ export interface RootRouteChildren {
   WithdrawRoute: typeof WithdrawRoute
   TicketIdRoute: typeof TicketIdRoute
   ApiPublicVirtualTickRoute: typeof ApiPublicVirtualTickRoute
+  ApiPublicHooksBroadcastPushRoute: typeof ApiPublicHooksBroadcastPushRoute
   ApiPublicHooksProcessScheduledPushRoute: typeof ApiPublicHooksProcessScheduledPushRoute
   ApiPublicHooksSendPushRoute: typeof ApiPublicHooksSendPushRoute
 }
@@ -791,6 +805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProcessScheduledPushRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/broadcast-push': {
+      id: '/api/public/hooks/broadcast-push'
+      path: '/api/public/hooks/broadcast-push'
+      fullPath: '/api/public/hooks/broadcast-push'
+      preLoaderRoute: typeof ApiPublicHooksBroadcastPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -851,6 +872,7 @@ const rootRouteChildren: RootRouteChildren = {
   WithdrawRoute: WithdrawRoute,
   TicketIdRoute: TicketIdRoute,
   ApiPublicVirtualTickRoute: ApiPublicVirtualTickRoute,
+  ApiPublicHooksBroadcastPushRoute: ApiPublicHooksBroadcastPushRoute,
   ApiPublicHooksProcessScheduledPushRoute:
     ApiPublicHooksProcessScheduledPushRoute,
   ApiPublicHooksSendPushRoute: ApiPublicHooksSendPushRoute,
