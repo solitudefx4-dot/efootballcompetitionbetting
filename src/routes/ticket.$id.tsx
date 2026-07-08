@@ -243,8 +243,9 @@ export function BetVoucher({ bet, sels, statusBadge, copy, shareCode }: {
               const isFuture = m?.match_kind === "future";
               const live = m?.status === "live";
               const ended = m?.status === "ended";
-              const won = s.result === "won";
-              const lost = s.result === "lost";
+              const r = selResult(s);
+              const won = r === "won";
+              const lost = r === "lost";
               const badgeCls = won ? "badge-won" : lost ? "badge-lost" : "badge-pending";
               const badgeLabel = won ? "WON" : lost ? "LOST" : live ? "LIVE" : "PENDING";
               const BadgeIcon = won ? Trophy : lost ? X : ClockIcon;
