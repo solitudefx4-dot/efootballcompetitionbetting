@@ -138,6 +138,11 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             {!isAdmin && isMod && <NavLink to="/mod" icon={Shield} label="Mod" danger />}
           </nav>
           <div className="flex items-center gap-2 shrink-0 ml-auto lg:ml-0">
+            <Link to="/shop" title="Rewards Shop" aria-label="Rewards Shop">
+              <Button variant="ghost" size="icon" className="rounded-full border border-transparent hover:border-primary/30">
+                <ShoppingBag className="h-4 w-4 text-primary" />
+              </Button>
+            </Link>
             {user && profile ? (
               <>
                 <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-gradient-to-r from-primary/10 to-accent/5 shadow-[0_0_15px_-5px_rgba(212,175,55,0.4)]">
