@@ -222,14 +222,14 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         </div>
       </nav>
       <div className="lg:hidden h-0" />
-      <SiteFooter />
+      <SiteFooter isHome={isHome} />
     </div>
   );
 };
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-function SiteFooter() {
+function SiteFooter({ isHome = false }: { isHome?: boolean }) {
   const [s, setS] = useState<any>(null);
   const [open, setOpen] = useState<"terms" | "about" | null>(null);
   useEffect(() => {
@@ -238,7 +238,7 @@ function SiteFooter() {
       .eq("id", 1).maybeSingle().then(({ data }) => setS(data));
   }, []);
   return (
-    <footer className="border-t border-border mt-20 backdrop-blur-xl bg-card/40 lg:pl-0 pl-16">
+    <footer className={`border-t border-border mt-20 backdrop-blur-xl bg-card/40 lg:pl-0 ${isHome ? "pl-0" : "pl-16"}`}>
       <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-6 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-2"><GangLogo size={28} withGlow={false} /><span className="font-bold tracking-widest gradient-gold-text uppercase">{s?.site_name || "LOMITA SHOOTERS LEAGUE"}</span></div>
