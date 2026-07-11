@@ -167,7 +167,7 @@ function Index() {
           keep the sidebar (Hot Bets + Hall of Fame) on the right, scaled small. */}
       <section className="container mt-6">
         <div className="grid gap-3 min-[560px]:gap-5 min-[560px]:grid-cols-[minmax(0,1fr)_minmax(0,200px)] lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_340px] items-start">
-          <div className="space-y-10 min-w-0">
+          <div className="space-y-6 min-w-0">
           {loading && <p className="text-muted-foreground">Loading league…</p>}
           {!loading && featuredFallback.length > 0 && (
             <div>
@@ -316,3 +316,259 @@ function FuturesSection({ title, markets, maxSelections, featured = [] }: { titl
                           if (blocked) return;
                           if (selections.filter((s) => s.is_future).length >= maxSelections) { toast.error(`This market allows up to ${maxSelections} futures selection${maxSelections === 1 ? "" : "s"}.`); return; }
                           add({ match_id: future.id, match_name: future.name, market_id: market.id, market_name: market.name, odd_id: odd.id, selection_label: odd.label, odds: Number(odd.value), is_future: true });
+                          setOpen(true);
+                        }
+                      }}
+                      disabled={blocked && !selected}
+                      className={`min-h-24 bg-card/90 px-3 py-2 text-left transition hover:bg-primary/10 disabled:opacity-45 disabled:hover:bg-card/90 ${selected ? "ring-2 ring-primary bg-primary/15" : ""}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FutureEmblem label={odd.label} url={odd.future_emblem_url} />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-bold text-foreground truncate">{odd.label}</div>
+                          <div className="text-[9px] uppercase tracking-widest text-muted-foreground truncate">{odd.future_candidate_type ?? "Contender"}</div>
+                        </div>
+                        <div className="font-mono font-black text-accent">{Number(odd.value).toFixed(2)}</div>
+                      </div>
+                      <FutureProgress odd={odd} />
+                    </button>
+                  );
+                })}
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function FutureEmblem({ label, url }: { label: string; url?: string | null }) {
+  const initials = label.split(/\s+/).filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "LS";
+  return (
+    <span className="h-10 w-10 shrink-0 rounded-full border border-primary/35 bg-primary/10 grid place-items-center overflow-hidden text-[11px] font-black text-primary">
+      {url ? <img src={url} alt="" className="h-full w-full object-cover" /> : initials}
+    </span>
+  );
+}
+
+// Featured matches rendered as SportyBet-style golden rows inside the
+// Seasonal Tournament banner, under the "Go to Tournament" header.
+function FeaturedGoldenMatches({ matches }: { matches: MatchRow[] }) {
+  const { selections, add, remove, setOpen } = useBetSlip();
+  if (matches.length === 0) return null;
+  return (
+    <div className="relative mt-5 space-y-2.5">
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-black text-amber-100">
+        <Flame className="h-3.5 w-3.5" /> Featured Matches
+      </div>
+      {matches.map((m) => {
+        const market = m.markets?.find((mk) => mk.is_open) ?? m.markets?.[0];
+        const odds = market?.odds ?? [];
+        const live = m.status === "live";
+        return (
+          <div key={m.id} className="rounded-2xl border border-amber-300/30 bg-black/35 backdrop-blur-sm overflow-hidden shadow-[0_8px_30px_-12px_rgba(0,0,0,0.7)]">
+            <div className="flex items-center justify-between gap-2 px-3 pt-2.5 text-[10px] uppercase tracking-widest">
+              <span className="inline-flex items-center gap-1.5 font-black text-amber-200">
+                {live ? (
+                  <><span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500" /></span> Live</>
+                ) : "Upcoming"}
+              </span>
+              <span className="font-mono text-amber-50/70">
+                {live ? "Round in play" : <>Starts in <Countdown target={m.start_time} /></>}
+              </span>
+            </div>
+            <Link to="/matches/$matchId" params={{ matchId: m.id }} className="flex items-center gap-3 px-3 py-2 hover:bg-amber-400/5 transition">
+              <TeamLogo name={m.home_team?.name} url={m.home_team?.logo_url} size={30} rounded="full" />
+              <div className="min-w-0 flex-1">
+                <div className="font-extrabold text-sm text-amber-50 leading-tight truncate uppercase">
+                  {m.home_team?.name ?? m.name}
+                  {m.away_team && <span className="text-amber-100/50 font-normal lowercase"> vs </span>}
+                  {m.away_team?.name}
+                </div>
+                <div className="text-[10px] text-amber-100/60 truncate">{market?.name ?? "Match winner"}</div>
+              </div>
+              {m.away_team && <TeamLogo name={m.away_team?.name} url={m.away_team?.logo_url} size={30} rounded="full" />}
+            </Link>
+            {odds.length > 0 && (
+              <div className="grid gap-px px-3 pb-3" style={{ gridTemplateColumns: `repeat(${Math.min(odds.length, 3)}, minmax(0,1fr))` }}>
+                {odds.slice(0, 3).map((o) => {
+                  const selected = selections.some((s) => s.odd_id === o.id);
+                  const blocked = !market?.is_open || m.status === "ended";
+                  return (
+                    <button
+                      key={o.id}
+                      disabled={blocked && !selected}
+                      onClick={() => {
+                        if (selected) { remove(o.id); return; }
+                        if (blocked) return;
+                        add({ match_id: m.id, match_name: m.name, market_id: market!.id, market_name: market!.name, odd_id: o.id, selection_label: o.label, odds: Number(o.value) });
+                        setOpen(true);
+                      }}
+                      className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-black/40 py-2 px-1 transition hover:bg-amber-400/15 disabled:opacity-40 disabled:hover:bg-black/40 ${selected ? "ring-2 ring-amber-300 bg-amber-400/20" : "border border-amber-300/15"}`}
+                    >
+                      <span className="text-[9px] uppercase tracking-wider text-amber-100/70 truncate max-w-full">{o.label}</span>
+                      <span className="font-mono font-black text-amber-200">{Number(o.value).toFixed(2)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FutureProgress({ odd }: { odd: any }) {
+  const progress = Array.isArray(odd.future_progress) ? odd.future_progress : [];
+  const status = odd.future_status ?? "active";
+  const latest = progress[progress.length - 1];
+  const completed = progress.filter((p: any) => p && p.round != null).length;
+  const tone = status === "winner" ? "text-emerald-300" : ["lost", "disqualified", "settled"].includes(status) ? "text-destructive" : "text-primary";
+  const lostRound = latest?.round ?? (completed > 0 ? completed : 1);
+  const headline = status === "winner"
+    ? "CHAMPION"
+    : status === "lost"
+      ? `LOST ROUND ${lostRound}`
+      : status === "disqualified"
+        ? "DISQUALIFIED"
+        : odd.future_next_title || `Round ${completed + 1}`;
+  return (
+    <div className="mt-2 border-t border-border/40 pt-2">
+      <div className={`text-[10px] uppercase tracking-widest font-bold ${tone}`}>{headline}</div>
+      <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className="h-full bg-gradient-gold" style={{ width: `${Math.min(100, Math.max(18, (completed + 1) * 22))}%` }} />
+      </div>
+      {latest?.round != null ? (
+        <div className="mt-1 text-[10px] text-muted-foreground truncate">
+          Round {latest.round}{latest.score ? ` · ${latest.score}` : ""}
+          {latest.opponent ? ` · ${["lost", "disqualified"].includes(latest.status) ? "lost to" : "beat"} ${latest.opponent}` : ""}
+        </div>
+      ) : (
+        <div className="mt-1 text-[10px] text-muted-foreground truncate">
+          {odd.future_next_title ? `Next: ${odd.future_next_title}` : "Awaiting next round"}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BookingCodeFab() {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const { add, clear } = useBetSlip();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const c = params.get("code");
+    if (c) { setCode(c.toUpperCase()); setOpen(true); }
+  }, []);
+
+  async function pasteFromClipboard() {
+    try {
+      const t = await navigator.clipboard.readText();
+      if (t) { setCode(t.trim().toUpperCase()); toast.success("Pasted from clipboard"); }
+      else toast.error("Clipboard is empty");
+    } catch {
+      toast.error("Clipboard not accessible — paste manually");
+    }
+  }
+
+  async function load() {
+    if (!user) { nav({ to: "/login" }); return; }
+    if (!code.trim()) return;
+    setLoading(true);
+    const { data: bet } = await supabase.from("bets")
+      .select("id, booking_code, bet_selections(*, matches!match_id(name, status), markets!market_id(name))")
+      .eq("booking_code", code.trim().toUpperCase()).maybeSingle();
+    setLoading(false);
+    if (!bet) { toast.error("Booking code not found", { description: `We couldn't locate any ticket with the code "${code.trim().toUpperCase()}". Double-check spelling or ask the owner to re-share.` }); return; }
+    const sels = bet.bet_selections ?? [];
+    const expired = sels.filter((s: any) => s.matches?.status && s.matches.status !== "scheduled");
+    if (expired.length === sels.length && sels.length > 0) {
+      toast.error("Booking code expired", {
+        description: `All ${sels.length} match(es) in this booking are already live or finished. New bets can only be placed before kick-off.`,
+      });
+      return;
+    }
+    clear();
+    let added = 0;
+    sels.forEach((s: any) => {
+      if (s.matches?.status !== "scheduled") return;
+      add({
+        match_id: s.match_id, match_name: s.matches?.name ?? "Match",
+        market_id: s.market_id, market_name: s.markets?.name ?? "Market",
+        odd_id: s.odd_id, selection_label: s.selection_label, odds: Number(s.locked_odds),
+      });
+      added++;
+    });
+    if (added === 0) {
+      toast.error("Booking code expired", {
+        description: "Every match on this slip has already started — picks can no longer be copied.",
+      });
+      return;
+    }
+    if (expired.length > 0) {
+      toast.warning(`Loaded ${added} pick(s) — ${expired.length} expired`, {
+        description: "Some matches on this booking are already live and were skipped.",
+      });
+    } else {
+      toast.success(`Loaded ${added} pick(s)`, { description: "Set your stake and place the bet to lock in." });
+    }
+    setOpen(false);
+    nav({ to: "/matches" });
+  }
+
+  return (
+    <>
+      <DraggableFab
+        storageKey="lsl-booking-code-fab-pos"
+        defaultSide="left"
+        ariaLabel="Paste booking code"
+        onClick={() => setOpen(true)}
+        className="group"
+      >
+        <span className="absolute inset-0 rounded-full bg-gradient-gold blur-md opacity-60 group-hover:opacity-90 transition" />
+        <span className="relative h-14 w-14 rounded-full bg-gradient-gold text-primary-foreground grid place-items-center shadow-gold border border-primary/40 active:scale-95 transition">
+          <ClipboardPaste className="h-6 w-6" />
+        </span>
+        <span className="absolute -top-1 -right-1 h-4 px-1 rounded-full bg-accent text-accent-foreground text-[9px] font-black grid place-items-center shadow">CODE</span>
+      </DraggableFab>
+      {open && (
+        <div className="fixed inset-0 z-50 bg-background/70 backdrop-blur-md grid place-items-center p-4" onClick={() => setOpen(false)}>
+          <Card className="glass-strong w-full max-w-md p-5 space-y-3 relative" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setOpen(false)} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+            <div className="flex items-center gap-2">
+              <span className="h-9 w-9 rounded-xl bg-gradient-gold grid place-items-center text-primary-foreground"><TicketIcon className="h-4 w-4" /></span>
+              <div>
+                <div className="font-bold">Play a friend's booking</div>
+                <div className="text-xs text-muted-foreground">Paste a booking code to copy their picks to your slip.</div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Input autoFocus value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="BOOKING CODE" className="font-mono uppercase" />
+              <Button variant="outline" onClick={pasteFromClipboard} title="Paste from clipboard"><ClipboardPaste className="h-4 w-4" /></Button>
+            </div>
+            <Button onClick={load} disabled={loading || !code.trim()} className="btn-luxury w-full">{loading ? "Loading…" : "Load picks"}</Button>
+          </Card>
+        </div>
+      )}
+    </>
+  );
+}
+
+function SectionHeader({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle: string }) {
+  return (
+    <div className="flex items-end justify-between border-b border-border pb-2">
+      <div>
+        <h2 className="text-2xl font-bold flex items-center gap-2"><Icon className="h-5 w-5 text-primary" />{title}</h2>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
