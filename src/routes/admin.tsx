@@ -1435,7 +1435,7 @@ async function settleFutureBets(matchId: string, winningOddIds: string[], winnin
 function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
   const [players, setPlayers] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
-  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, marketing: true, homePresent: false, awayPresent: false, restrictRepeat: false });
+  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, featured_image_url: null as string | null, featured_image_fit: "cover", featured_image_position: "center", marketing: true, homePresent: false, awayPresent: false, restrictRepeat: false });
 
   useEffect(() => {
     Promise.all([
@@ -1461,6 +1461,8 @@ function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
       match_kind: "shooter",
       marketing_enabled: form.marketing,
       is_featured: form.featured,
+      featured_image_url: form.featured ? form.featured_image_url : null,
+      featured_image_fit: form.featured_image_fit, featured_image_position: form.featured_image_position,
       location: form.location || "Shooter 1v1",
       start_time: form.start_time ? new Date(form.start_time).toISOString() : new Date().toISOString(),
       status: "scheduled",
