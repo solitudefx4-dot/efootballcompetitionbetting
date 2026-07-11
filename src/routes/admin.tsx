@@ -17,7 +17,7 @@ import {
   Shield, Users, Trophy, Coins, Megaphone, Settings as SettingsIcon, Ticket, AlertTriangle,
   Calendar, Tag, Image as ImageIcon, BarChart3, History, Send, Plus, Trash2, Pencil, ChevronRight, ChevronLeft, Wallet, ListOrdered, Sparkles, ClipboardList, Lock, Pause, Play, Check, X, MessageSquare, Eye, RotateCw, Copy, Globe, MapPin, Smartphone, Clock, Filter,
   Dice5, LogOut, Crosshair, Target, Flame, ThumbsUp, ThumbsDown,
-  Gift, BellRing, GalleryHorizontalEnd, Gamepad2, Vote, ShoppingBag, LifeBuoy,
+  Gift, BellRing, GalleryHorizontalEnd, Gamepad2, Vote, ShoppingBag, LifeBuoy, Newspaper,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import lslLogo from "@/assets/lsl-logo.png";
@@ -1435,7 +1435,7 @@ async function settleFutureBets(matchId: string, winningOddIds: string[], winnin
 function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
   const [players, setPlayers] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
-  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, marketing: true, homePresent: false, awayPresent: false, restrictRepeat: false });
+  const [form, setForm] = useState({ home_player_id: "", away_player_id: "", oddsA: 2, draw: 3.5, oddsB: 2, name: "", start_time: "", location: "", featured: true, featured_image_url: null as string | null, featured_image_fit: "cover", featured_image_position: "center", marketing: true, homePresent: false, awayPresent: false, restrictRepeat: false });
 
   useEffect(() => {
     Promise.all([
@@ -1461,6 +1461,8 @@ function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
       match_kind: "shooter",
       marketing_enabled: form.marketing,
       is_featured: form.featured,
+      featured_image_url: form.featured ? form.featured_image_url : null,
+      featured_image_fit: form.featured_image_fit, featured_image_position: form.featured_image_position,
       location: form.location || "Shooter 1v1",
       start_time: form.start_time ? new Date(form.start_time).toISOString() : new Date().toISOString(),
       status: "scheduled",
@@ -1497,6 +1499,19 @@ function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
             <label className="flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 p-3"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Feature on homepage</label>
             <label className="flex items-center gap-2 rounded-lg border border-accent/20 bg-card/60 p-3"><Switch checked={form.marketing} onCheckedChange={(v) => setForm({ ...form, marketing: v })} />Post for marketing</label>
           </div>
+          {form.featured && (
+            <ImageSettingControl
+              label="Featured match image (optional)"
+              value={form.featured_image_url}
+              onChange={(url) => setForm({ ...form, featured_image_url: url })}
+              fit={form.featured_image_fit}
+              onFitChange={(v) => setForm({ ...form, featured_image_fit: v })}
+              position={form.featured_image_position}
+              onPositionChange={(v) => setForm({ ...form, featured_image_position: v })}
+              aspect="16 / 9"
+              help="Shown as the backdrop of this shooter match in the home page Featured section."
+            />
+          )}
           <div className="grid grid-cols-2 gap-2 text-sm">
             <label className="flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 p-3"><Switch checked={form.homePresent} onCheckedChange={(v) => setForm({ ...form, homePresent: v })} />Shooter A present (counts on Leaderboard)</label>
             <label className="flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 p-3"><Switch checked={form.awayPresent} onCheckedChange={(v) => setForm({ ...form, awayPresent: v })} />Shooter B present (counts on Leaderboard)</label>
@@ -1876,7 +1891,7 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
   const [cats, setCats] = useState<any[]>([]);
   const [teamA, setTeamA] = useState({ id: "", name: "", logoFile: null as File | null, mainPlayers: "", subPlayers: "" });
   const [teamB, setTeamB] = useState({ id: "", name: "", logoFile: null as File | null, mainPlayers: "", subPlayers: "" });
-  const [details, setDetails] = useState({ homeIs: "A" as "A" | "B", oddsA: 2.0, draw: 3.5, oddsB: 2.0, name: "", start_time: "", location: "", category_id: "", featured: false, homePresent: false, awayPresent: false, restrictRepeat: false });
+  const [details, setDetails] = useState({ homeIs: "A" as "A" | "B", oddsA: 2.0, draw: 3.5, oddsB: 2.0, name: "", start_time: "", location: "", category_id: "", featured: false, featured_image_url: null as string | null, featured_image_fit: "cover", featured_image_position: "center", homePresent: false, awayPresent: false, restrictRepeat: false });
   const [csEnabled, setCsEnabled] = useState(true);
   const [csRows, setCsRows] = useState<Array<{ label: string; value: number }>>(
     POPULAR_SCORES.map(([h, a]) => {
@@ -1931,6 +1946,8 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
       start_time: details.start_time ? new Date(details.start_time).toISOString() : new Date().toISOString(),
       location: details.location, status: "scheduled",
       category_id: details.category_id || null, is_featured: details.featured,
+      featured_image_url: details.featured ? details.featured_image_url : null,
+      featured_image_fit: details.featured_image_fit, featured_image_position: details.featured_image_position,
       home_present: details.homePresent, away_present: details.awayPresent, restrict_repeat_contender: details.restrictRepeat,
     }).select().single();
     if (error) { toast.error(error.message); return; }
@@ -2039,6 +2056,19 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
             </div>
             <Input placeholder="Location / Venue" value={details.location} onChange={(e) => setDetails({ ...details, location: e.target.value })} />
             <label className="flex items-center gap-2 text-sm"><Switch checked={details.featured} onCheckedChange={(v) => setDetails({ ...details, featured: v })} /> Publish on homepage as Featured</label>
+            {details.featured && (
+              <ImageSettingControl
+                label="Featured match image (optional)"
+                value={details.featured_image_url}
+                onChange={(url) => setDetails({ ...details, featured_image_url: url })}
+                fit={details.featured_image_fit}
+                onFitChange={(v) => setDetails({ ...details, featured_image_fit: v })}
+                position={details.featured_image_position}
+                onPositionChange={(v) => setDetails({ ...details, featured_image_position: v })}
+                aspect="16 / 9"
+                help="Shown as the backdrop of this specific match in the home page Featured section (when no Seasonal Tournament is active)."
+              />
+            )}
             <div className="grid grid-cols-2 gap-2">
               <label className="flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 p-3 text-sm"><Switch checked={details.homePresent} onCheckedChange={(v) => setDetails({ ...details, homePresent: v })} /> Home team present (counts on Leaderboard)</label>
               <label className="flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 p-3 text-sm"><Switch checked={details.awayPresent} onCheckedChange={(v) => setDetails({ ...details, awayPresent: v })} /> Away team present (counts on Leaderboard)</label>
@@ -3355,6 +3385,7 @@ const QUICK_ACTIONS: { i: any; l: string; t: string }[] = [
   { i: Vote, l: "Polls", t: "polls" },
   { i: ShoppingBag, l: "Shop", t: "shop" },
   { i: LifeBuoy, l: "FAQ / Help", t: "faq" },
+  { i: Newspaper, l: "News", t: "news" },
   { i: ListOrdered, l: "Leaderboard", t: "leaderboard" },
   { i: Trophy, l: "Matches", t: "matches" },
   { i: Send, l: "Notify", t: "notify" },
@@ -3684,17 +3715,9 @@ function SettingsPanel() {
           aspect="21 / 9"
           help="Background image behind the hero headline at the very top of the home page. Leave empty for a clean dark hero (no image)."
         />
-        <ImageSettingControl
-          label="Featured Matches background"
-          value={s.featured_bg_url}
-          onChange={(url) => setS({ ...s, featured_bg_url: url })}
-          fit={s.featured_bg_fit ?? "cover"}
-          onFitChange={(v) => setS({ ...s, featured_bg_fit: v })}
-          position={s.featured_bg_position ?? "center"}
-          onPositionChange={(v) => setS({ ...s, featured_bg_position: v })}
-          aspect="16 / 9"
-          help="Background image shown behind the “Featured Matches” section on the home page. Only appears when there is NO active Seasonal Tournament. Leave empty for the plain dark section."
-        />
+        <div className="rounded-lg border border-primary/15 bg-background/30 p-3 text-[11px] text-muted-foreground">
+          <span className="font-semibold text-foreground">Featured match images</span> are now set per match. Add an image when you create or edit a Featured match (or shooter match / tournament fixture) — it appears as the backdrop of that specific match in the home page Featured section.
+        </div>
         <ImageSettingControl
           label="Admin console header image"
           value={s.admin_hero_url}
