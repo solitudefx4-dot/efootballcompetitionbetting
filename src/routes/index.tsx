@@ -163,11 +163,11 @@ function Index() {
       <BookingCodeFab />
 
       {/* Match feed on the left · Hot Bets + Hall of Fame stacked on the right.
-          The two-column layout kicks in from ~560px so phones in desktop mode
+          The two-column layout kicks in from ~500px so phones in desktop mode
           keep the sidebar (Hot Bets + Hall of Fame) on the right, scaled small. */}
-      <section className="container mt-6">
-        <div className="grid gap-3 min-[560px]:gap-5 min-[560px]:grid-cols-[minmax(0,1fr)_minmax(0,200px)] lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_340px] items-start">
-          <div className="space-y-6 min-w-0">
+      <section className="container mt-3">
+        <div className="grid gap-3 min-[500px]:gap-5 min-[500px]:grid-cols-[minmax(0,1fr)_minmax(0,200px)] lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_300px] items-start">
+          <div className="space-y-3 min-w-0">
           {loading && <p className="text-muted-foreground">Loading league…</p>}
           {!loading && featuredFallback.length > 0 && (
             <div>
