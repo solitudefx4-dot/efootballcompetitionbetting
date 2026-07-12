@@ -155,7 +155,8 @@ function BetTicket({ bet, viewerId }: { bet: any; viewerId: string }) {
 
         {!isOwner && (
           <Card className="glass mt-4 p-3 text-xs text-muted-foreground">
-            Viewing a shared booking. Use the booking code on the home page to copy these picks to your own slip.
+            Viewing a shared booking because you are an administrator. Use the booking code on the home page to copy
+            these picks to your own slip.
           </Card>
         )}
       </div>
