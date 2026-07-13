@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trophy, X, Sparkles } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
