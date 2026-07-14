@@ -334,12 +334,24 @@ function FutureEmblem({ label, url }: { label: string; url?: string | null }) {
 
 // Featured matches rendered as SportyBet-style golden rows inside the
 // Seasonal Tournament banner, under the "Go to Tournament" header.
-function FeaturedGoldenMatches({ matches }: { matches: MatchRow[] }) {
+function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: MatchRow[]; bgImage?: string | null; bgFit?: string | null; bgPos?: string | null }) {
   const { selections, add, remove, setOpen } = useBetSlip();
   if (matches.length === 0) return null;
   return (
-    <div className="relative mt-5 space-y-2.5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-black text-amber-100">
+    <div className="seasonal-golden relative overflow-hidden rounded-3xl px-4 py-5 md:px-6 md:py-6 space-y-3">
+      {bgImage && (
+        <>
+          <img
+            src={bgImage}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full"
+            style={{ objectFit: (bgFit as any) || "cover", objectPosition: bgPos || "center" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/25" />
+        </>
+      )}
+      <div className="relative flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-black text-amber-100">
         <Flame className="h-3.5 w-3.5" /> Featured Matches
       </div>
       {matches.map((m) => {
