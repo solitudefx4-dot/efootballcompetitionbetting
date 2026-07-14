@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Crosshair, Trophy, ArrowRight, Radio, Users, History } from "lucide-react";
 
-export const Route = createFileRoute("/virtual")({
+export const Route = createFileRoute("/virtual/")({
   head: () => ({
     meta: [
       { title: "Virtual Matches — Instant & Championship | LSL" },
