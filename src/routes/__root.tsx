@@ -157,6 +157,7 @@ import { MaintenanceGate } from "@/components/MaintenanceGate";
 import { BanGate } from "@/components/BanGate";
 import { ConfirmProvider } from "@/components/ConfirmDialog";
 import { PopupAd } from "@/components/PopupAd";
+import { CookieConsent } from "@/components/CookieConsent";
 import { BetSlipFab } from "@/components/BetSlip";
 import { RouteProgress } from "@/components/RouteProgress";
 import { useBranding } from "@/lib/branding";
@@ -212,6 +213,7 @@ function RootComponent() {
             <PopupAd />
             <BetSlipFab />
             <RouteProgress />
+            <CookieConsent />
             <Toaster />
           </ConfirmProvider>
         </BetSlipProvider>
