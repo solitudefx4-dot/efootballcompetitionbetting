@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RiskPanel, PnLPanel, ReferralsAdminPanel, EmblemModerationPanel, VipAdminPanel, StreakAndPushPanel, TokenRulesPanel, BroadcastPanel, ActivityPanel, ReportsPanel, AdminAILivePanel } from "@/components/admin/AdminExtensions";
 import { VirtualAdminPanel } from "@/components/admin/VirtualAdminPanel";
+import { ChampionshipAdminPanel } from "@/components/admin/ChampionshipAdminPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
@@ -193,6 +194,7 @@ export function AdminPage() {
             <TabsContent value="users" className="mt-4"><UsersPanel /></TabsContent>
             <TabsContent value="bannedusers" className="mt-4"><BannedUsersPanel /></TabsContent>
             <TabsContent value="virtual" className="mt-4"><VirtualAdminPanel /></TabsContent>
+            <TabsContent value="championship" className="mt-4"><ChampionshipAdminPanel /></TabsContent>
             <TabsContent value="matches" className="mt-4"><MatchesPanel /></TabsContent>
             <TabsContent value="futures" className="mt-4"><FuturesAdminPanel /></TabsContent>
             <TabsContent value="events" className="mt-4"><EventsPanel /></TabsContent>
@@ -3389,6 +3391,7 @@ const QUICK_ACTIONS: { i: any; l: string; t: string }[] = [
   { i: Newspaper, l: "News", t: "news" },
   { i: ListOrdered, l: "Leaderboard", t: "leaderboard" },
   { i: Trophy, l: "Matches", t: "matches" },
+  { i: Trophy, l: "Championship", t: "championship" },
   { i: Send, l: "Notify", t: "notify" },
   { i: BarChart3, l: "P&L", t: "pnl" },
   { i: Tag, l: "Promo Codes", t: "promos" },
