@@ -4222,7 +4222,7 @@ function BetTrackerPanel() {
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
           <SelectContent>
-            {["all","open","won","lost","suspended","refunded","cashed_out","void"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            {["all","virtual","real","championship","football_instant","open","won","lost","suspended","refunded","cashed_out","void"].map((s) => <SelectItem key={s} value={s}>{s.replace(/_/g," ")}</SelectItem>)}
           </SelectContent>
         </Select>
       </Card>
