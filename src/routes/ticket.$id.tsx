@@ -202,7 +202,13 @@ export function BetVoucher({
       if (["disqualified", "eliminated", "settled_lost"].includes(s.odds?.future_status)) return "lost";
       return "pending";
     }
-    if (!m || m.status !== "ended") return "pending";
+    // Never mark a selection as LOST until the backend has actually settled the
+    // match. Previously we compared against home/away scores as soon as
+    // status flipped to "ended", which briefly displayed winning
+    // Correct-Score picks as LOST while settlement was still running.
+    if (!m) return "pending";
+    if (s.odds?.is_winner === true) return "won";
+    if (!m.settled_at) return "pending";
     if (s.markets?.name === "Correct Score")
       return s.selection_label === `${m.home_score}-${m.away_score}` ? "won" : "lost";
     const lead =
