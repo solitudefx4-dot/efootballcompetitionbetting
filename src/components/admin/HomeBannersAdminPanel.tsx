@@ -24,7 +24,7 @@ export function HomeBannersAdminPanel() {
 
   function load() {
     (supabase as any).from("home_banners").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false })
-      .then(({ data }) => setItems(data ?? []));
+      .then(({ data }: { data: any }) => setItems(data ?? []));
   }
   useEffect(() => { load(); }, []);
 
