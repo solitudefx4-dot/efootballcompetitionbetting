@@ -1308,9 +1308,9 @@ function MatchesPanel() {
         <Button className="btn-luxury" onClick={() => setShooterWizard(true)}><Crosshair className="h-4 w-4 mr-1" />New Shooter Match</Button>
         <Button className="btn-luxury" onClick={() => window.dispatchEvent(new CustomEvent("admin:set-tab", { detail: "futures" }))}><Target className="h-4 w-4 mr-1" />New Tournament Futures</Button>
         <Button variant="destructive" onClick={clearEnded}>
-          <Trash2 className="h-4 w-4 mr-1" />Clear Ended Matches
+          <Trash2 className="h-4 w-4 mr-1" />Clear Ended & Cancelled
         </Button>
-        <Badge variant="outline" className="ml-auto text-[10px]">Bet history is preserved — only the panel list is cleared.</Badge>
+        <Badge variant="outline" className="ml-auto text-[10px]">Wipes both ended and cancelled matches. Bet history preserved.</Badge>
       </div>
       {wizard && <MatchWizard onClose={() => { setWizard(false); load(); }} />}
       {shooterWizard && <ShooterMatchWizard onClose={() => { setShooterWizard(false); load(); }} />}
