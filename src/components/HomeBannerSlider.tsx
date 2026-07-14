@@ -18,7 +18,7 @@ export function HomeBannerSlider({ embedded = false, placement = "home" }: { emb
       .eq("placement", placement)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false })
-      .then(({ data }) => setItems(data ?? []));
+      .then(({ data }: { data: any }) => setItems(data ?? []));
   }, [placement]);
 
   if (items.length === 0) return null;
