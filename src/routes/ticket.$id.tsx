@@ -187,7 +187,12 @@ export function BetVoucher({
     const m = s.matches;
     if (m?.match_kind === "future") return s.odds?.future_status === "winner";
     if (!m || m.status !== "ended") return false;
-    if (s.markets?.name === "Correct Score") return s.selection_label === `${m.home_score}-${m.away_score}`;
+    if (s.markets?.name === "Correct Score") {
+      const score = `${m.home_score}-${m.away_score}`;
+      const label = String(s.selection_label ?? "");
+      const inner = label.match(/\[(.*?)\]/)?.[1] ?? label;
+      return inner === score;
+    }
     const lead =
       m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
     return s.selection_label === lead;
@@ -210,8 +215,12 @@ export function BetVoucher({
     // the leg from the score instead of leaving it stuck on PENDING.
     const canResolve = betFinalized || m.status === "ended" || !!m.settled_at;
     if (!canResolve) return "pending";
-    if (s.markets?.name === "Correct Score")
-      return s.selection_label === `${m.home_score}-${m.away_score}` ? "won" : "lost";
+    if (s.markets?.name === "Correct Score") {
+      const score = `${m.home_score}-${m.away_score}`;
+      const label = String(s.selection_label ?? "");
+      const inner = label.match(/\[(.*?)\]/)?.[1] ?? label;
+      return inner === score ? "won" : "lost";
+    }
     const lead =
       m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
     return s.selection_label === lead ? "won" : "lost";
