@@ -170,8 +170,7 @@ function Index() {
           {loading && <p className="text-muted-foreground">Loading league…</p>}
           {!loading && featuredFallback.length > 0 && (
             <div>
-              <SectionHeader icon={Trophy} title="Featured Matches" subtitle="The biggest matchups of the round." />
-              <div className="mt-4">
+              <div>
                 <Carousel opts={{ loop: featuredFallback.length > 1 }} plugins={featuredFallback.length > 1 ? [Autoplay({ delay: 5000, stopOnInteraction: false })] : []}>
                   <CarouselContent>
                     {featuredFallback.map((m) => (
