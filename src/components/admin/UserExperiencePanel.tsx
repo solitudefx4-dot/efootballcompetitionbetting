@@ -29,6 +29,7 @@ export function UserExperiencePanel() {
   const [loading, setLoading] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(0);
   const [consentRejected, setConsentRejected] = useState(0);
+  const [nameById, setNameById] = useState<Record<string, string>>({});
 
   const load = async () => {
     setLoading(true);
@@ -40,6 +41,19 @@ export function UserExperiencePanel() {
       .order("created_at", { ascending: false })
       .limit(5000);
     setRows((data ?? []) as EventRow[]);
+
+    const userIds = Array.from(new Set(((data ?? []) as EventRow[]).map(r => r.user_id).filter(Boolean))) as string[];
+    if (userIds.length) {
+      const { data: profs } = await (supabase as any)
+        .from("profiles")
+        .select("id, full_name, ingame_name")
+        .in("id", userIds);
+      const map: Record<string, string> = {};
+      (profs ?? []).forEach((p: any) => { map[p.id] = p.ingame_name || p.full_name || "user"; });
+      setNameById(map);
+    } else {
+      setNameById({});
+    }
 
     const { count: acc } = await (supabase as any)
       .from("analytics_events")
@@ -238,7 +252,7 @@ export function UserExperiencePanel() {
                 <div className="w-20 truncate text-muted-foreground">{new Date(r.created_at).toLocaleTimeString()}</div>
                 <div className="w-24 truncate text-primary font-mono">{r.event_type}</div>
                 <div className="flex-1 truncate font-mono text-muted-foreground">{r.path ?? "—"}</div>
-                <div className="w-16 truncate text-right text-muted-foreground">{r.user_id ? "user" : "guest"}</div>
+                <div className="w-24 truncate text-right text-muted-foreground">{r.user_id ? (nameById[r.user_id] ?? "user") : "guest"}</div>
               </div>
             ))}
             {rows.length === 0 && <div className="text-xs text-muted-foreground">No events in this window.</div>}
