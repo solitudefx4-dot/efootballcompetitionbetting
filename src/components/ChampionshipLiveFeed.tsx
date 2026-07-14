@@ -14,6 +14,63 @@ type Team = { id: string; name: string; logo_url: string | null };
 
 const STAGE_LABEL: Record<string, string> = { R16: "Round of 16", QF: "Quarterfinal", SF: "Semifinal", F: "Final" };
 
+/** Mini football pitch SVG with a bouncing ball; purely decorative live-arena feel. */
+function PitchMini({ scoreA, scoreB, nameA, nameB, seed, football }: { scoreA: number; scoreB: number; nameA: string; nameB: string; seed: string; football: boolean }) {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const iv = setInterval(() => setTick((t) => (t + 1) % 240), 120);
+    return () => clearInterval(iv);
+  }, []);
+  // deterministic seeded offsets per match, animated by tick
+  const h = Array.from(seed).reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const bx = 20 + ((tick * 4 + (h % 60)) % 260);
+  const by = 22 + Math.abs(Math.sin((tick + h) * 0.15)) * 60;
+  return (
+    <div className="relative w-full rounded-md overflow-hidden border border-emerald-500/30" style={{ aspectRatio: "3 / 1" }}>
+      <svg viewBox="0 0 300 100" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+        {/* pitch */}
+        <defs>
+          <linearGradient id="pitch" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#052e16" />
+            <stop offset="1" stopColor="#022c22" />
+          </linearGradient>
+          <pattern id="stripes" width="20" height="100" patternUnits="userSpaceOnUse">
+            <rect width="10" height="100" fill="rgba(16,185,129,0.08)" />
+          </pattern>
+        </defs>
+        <rect width="300" height="100" fill="url(#pitch)" />
+        <rect width="300" height="100" fill="url(#stripes)" />
+        {/* center line + circle */}
+        <line x1="150" y1="0" x2="150" y2="100" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
+        <circle cx="150" cy="50" r="14" fill="none" stroke="rgba(255,255,255,0.35)" />
+        {/* goals */}
+        <rect x="0" y="35" width="8" height="30" fill="none" stroke="rgba(255,255,255,0.45)" />
+        <rect x="292" y="35" width="8" height="30" fill="none" stroke="rgba(255,255,255,0.45)" />
+        {/* penalty boxes */}
+        <rect x="0" y="20" width="40" height="60" fill="none" stroke="rgba(255,255,255,0.25)" />
+        <rect x="260" y="20" width="40" height="60" fill="none" stroke="rgba(255,255,255,0.25)" />
+        {/* ball */}
+        <circle cx={bx} cy={by} r="3.5" fill="#fef3c7" stroke="#0f172a" strokeWidth="0.6" />
+        {/* players (dots) */}
+        {[20, 70, 120, 180].map((x, i) => (
+          <circle key={`a${i}`} cx={x} cy={30 + ((h >> i) % 40)} r="2.6" fill="#ef4444" />
+        ))}
+        {[110, 170, 220, 270].map((x, i) => (
+          <circle key={`b${i}`} cx={x} cy={30 + ((h >> (i + 2)) % 40)} r="2.6" fill="#38bdf8" />
+        ))}
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-between px-2 text-[10px] font-black">
+        <span className="truncate max-w-[35%] text-red-200 drop-shadow">{nameA}</span>
+        <span className="text-amber-300 tabular-nums text-sm drop-shadow">{scoreA} – {scoreB}</span>
+        <span className="truncate max-w-[35%] text-sky-200 text-right drop-shadow">{nameB}</span>
+      </div>
+      {football && (
+        <div className="absolute top-1 left-1 text-[8px] uppercase tracking-widest bg-emerald-500/30 text-emerald-100 px-1 rounded">⚽ LIVE</div>
+      )}
+    </div>
+  );
+}
+
 /** Live commentary + score feed for a championship bracket. Streams live-stage
  * events per match, shows just-settled scores, and previews next-round line-up
  * during the between-stage gap. Football vs generic just flavours the copy. */
@@ -77,13 +134,18 @@ export function ChampionshipLiveFeed({ tournamentId, sport, currentStage }: { to
           <div className="grid gap-2">
             {live.map((r) => {
               const ev = (r.live_events ?? []).slice(-3).reverse();
+              const nameA = nameOf(r.participant_a_id);
+              const nameB = nameOf(r.participant_b_id);
               return (
                 <div key={r.id} className="rounded-md border border-destructive/30 bg-destructive/5 p-2">
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="font-bold truncate flex-1">{nameOf(r.participant_a_id)}</span>
-                    <span className="tabular-nums font-black text-amber-300 text-base">{r.score_a ?? 0} – {r.score_b ?? 0}</span>
-                    <span className="font-bold truncate flex-1 text-right">{nameOf(r.participant_b_id)}</span>
-                  </div>
+                  <PitchMini
+                    scoreA={r.score_a ?? 0}
+                    scoreB={r.score_b ?? 0}
+                    nameA={nameA}
+                    nameB={nameB}
+                    seed={r.id}
+                    football={sport === "football"}
+                  />
                   {ev.length > 0 && (
                     <ul className="mt-1.5 space-y-0.5 text-[10.5px] text-muted-foreground">
                       {ev.map((e, i) => (
