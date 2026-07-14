@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { ShieldAlert } from "lucide-react";
-import gangsterAsset from "@/assets/auth-gangster.jpg.asset.json";
+import authHero from "@/assets/efootball-striker.jpg";
 import { useBranding } from "@/lib/branding";
 
 function AuthBrand() {
@@ -78,7 +78,7 @@ function LoginPage() {
         {/* LEFT — cinematic gangster panel */}
         <div className="relative hidden md:block overflow-hidden">
           <img
-            src={brandingHero || gangsterAsset.url}
+            src={brandingHero || authHero}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             loading="eager"
