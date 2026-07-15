@@ -17,6 +17,8 @@ export function HomeBannersAdminPanel() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [imageFit, setImageFit] = useState<string>("cover");
+  const [imagePosition, setImagePosition] = useState<string>("center");
   const [link, setLink] = useState("/matches");
   const [cta, setCta] = useState("Click here");
   const [placement, setPlacement] = useState<"home" | "matches">("home");
@@ -35,13 +37,14 @@ export function HomeBannersAdminPanel() {
       title: title.trim(), subtitle: subtitle.trim(), image_url: image,
       link_url: link.trim() || "/", cta_label: cta.trim() || "Click here",
       is_active: true, sort_order: items.length, created_by: user?.id ?? null,
-      placement,
+      placement, image_fit: imageFit, image_position: imagePosition,
     }).select("id").maybeSingle();
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success(`Banner published to the ${placement} page`);
     logAudit("banner_create", "home_banner", inserted?.id, { placement, title: title.trim(), link_url: link.trim() });
     setTitle(""); setSubtitle(""); setImage(null); setLink("/matches"); setCta("Click here");
+    setImageFit("cover"); setImagePosition("center");
     load();
   }
   async function toggle(b: any) {
@@ -65,6 +68,11 @@ export function HomeBannersAdminPanel() {
     logAudit("banner_reorder", "home_banner", b.id, { placement: b.placement, from: b.sort_order, to: next });
     load();
   }
+  async function updateCrop(b: any, patch: { image_fit?: string; image_position?: string }) {
+    const { error } = await (supabase as any).from("home_banners").update(patch).eq("id", b.id);
+    if (error) return toast.error(error.message);
+    load();
+  }
 
   return (
     <div className="space-y-4 max-w-3xl">
@@ -82,7 +90,17 @@ export function HomeBannersAdminPanel() {
             <option value="matches">Matches page</option>
           </select>
         </div>
-        <ImageSettingControl label="Banner image" value={image} onChange={setImage} showFitControls={false} aspect="16 / 5" help="Wide image works best (e.g. 1600×500)." />
+        <ImageSettingControl
+          label="Banner image"
+          value={image}
+          onChange={setImage}
+          fit={imageFit}
+          onFitChange={setImageFit}
+          position={imagePosition}
+          onPositionChange={setImagePosition}
+          aspect="16 / 5"
+          help="Wide image works best (e.g. 1600×500). Use Crop/fit + Position to control how it frames."
+        />
         <div className="grid gap-2 sm:grid-cols-2">
           <Input placeholder="Headline (optional)" value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input placeholder='CTA label (e.g. "Click here")' value={cta} onChange={(e) => setCta(e.target.value)} />
@@ -99,8 +117,15 @@ export function HomeBannersAdminPanel() {
         <div className="font-bold">Banners ({items.length})</div>
         {items.length === 0 && <p className="text-sm text-muted-foreground">No banners yet.</p>}
         {items.map((b) => (
-          <div key={b.id} className="rounded-lg border border-border/70 p-2.5 flex items-center gap-3">
-            {b.image_url && <img src={b.image_url} alt="" className="h-12 w-24 rounded object-cover shrink-0" />}
+          <div key={b.id} className="rounded-lg border border-border/70 p-2.5 flex items-center gap-3 flex-wrap">
+            {b.image_url && (
+              <img
+                src={b.image_url}
+                alt=""
+                className="h-12 w-24 rounded shrink-0 bg-black"
+                style={{ objectFit: (b.image_fit as any) || "cover", objectPosition: b.image_position || "center" }}
+              />
+            )}
             <div className="min-w-0 flex-1">
               <div className="font-semibold truncate">{b.title || "(no headline)"}</div>
               <div className="text-[11px] text-muted-foreground truncate">
@@ -113,6 +138,38 @@ export function HomeBannersAdminPanel() {
               <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => move(b, 1)}>↓</Button>
               <Switch checked={b.is_active} onCheckedChange={() => toggle(b)} />
               <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => remove(b.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+            <div className="w-full grid grid-cols-2 gap-2 pt-1">
+              <label className="text-[10px] uppercase text-muted-foreground space-y-1">
+                <span>Crop / fit</span>
+                <select
+                  className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                  value={b.image_fit || "cover"}
+                  onChange={(e) => updateCrop(b, { image_fit: e.target.value })}
+                >
+                  <option value="cover">Cover (fill & crop)</option>
+                  <option value="contain">Contain (fit whole image)</option>
+                  <option value="fill">Stretch to fill</option>
+                </select>
+              </label>
+              <label className="text-[10px] uppercase text-muted-foreground space-y-1">
+                <span>Position</span>
+                <select
+                  className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
+                  value={b.image_position || "center"}
+                  onChange={(e) => updateCrop(b, { image_position: e.target.value })}
+                >
+                  <option value="center">Center</option>
+                  <option value="top">Top</option>
+                  <option value="bottom">Bottom</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                  <option value="top left">Top left</option>
+                  <option value="top right">Top right</option>
+                  <option value="bottom left">Bottom left</option>
+                  <option value="bottom right">Bottom right</option>
+                </select>
+              </label>
             </div>
           </div>
         ))}
