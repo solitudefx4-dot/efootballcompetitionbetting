@@ -48,7 +48,6 @@ export function ImageCropDialog({
   const [aspectKey, setAspectKey] = useState(defaultAspect);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
   const [area, setArea] = useState<Area | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -81,17 +80,15 @@ export function ImageCropDialog({
               image={src}
               crop={crop}
               zoom={zoom}
-              rotation={rotation}
               aspect={aspect as number | undefined}
               onCropChange={setCrop}
               onZoomChange={setZoom}
-              onRotationChange={setRotation}
               onCropComplete={onCropComplete}
               restrictPosition={false}
             />
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Aspect</div>
             <Select value={aspectKey} onValueChange={setAspectKey}>
@@ -102,10 +99,6 @@ export function ImageCropDialog({
           <div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Zoom</div>
             <Slider value={[zoom]} min={1} max={4} step={0.01} onValueChange={(v) => setZoom(v[0])} />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Rotation</div>
-            <Slider value={[rotation]} min={0} max={360} step={1} onValueChange={(v) => setRotation(v[0])} />
           </div>
         </div>
         <DialogFooter>
