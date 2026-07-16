@@ -294,7 +294,7 @@ export function TournamentAdminPanel() {
       <div className="grid lg:grid-cols-[380px_1fr] gap-4">
         <Card className="glass-strong p-4 space-y-3">
           <div className="font-bold flex items-center gap-2"><Trophy className="h-4 w-4 text-primary" />Create Tournament</div>
-          <div className="space-y-1"><Label className="text-xs text-muted-foreground">Tournament name (words, e.g. \"E-Football Competition Bet\")</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Sunday Night Shootout" /></div>
+          <div className="space-y-1"><Label className="text-xs text-muted-foreground">Tournament name (words, e.g. "E-Football Competition Bet")</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Spring Championship" /></div>
           <div className="space-y-1"><Label className="text-xs text-muted-foreground">Tagline (short slogan)</Label><Input value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="ONE LEAGUE. NO MERCY. RESPECT THE GAME." /></div>
           <div className="space-y-1"><Label className="text-xs text-muted-foreground">Event date (calendar)</Label><Input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} /></div>
           <Button className="btn-luxury w-full" onClick={createTournament}><Plus className="h-4 w-4 mr-1" />Create Tournament</Button>
@@ -399,7 +399,7 @@ export function TournamentAdminPanel() {
               )}
             </div>
 
-            <p className="text-[11px] text-muted-foreground">The order below is the bracket placement — use the arrows to decide who faces who. Pairs are formed top-to-bottom (1 vs 2, 3 vs 4, etc).{searchQuery && ` (showing ${filteredParticipants.length} of ${participants.length})`}</p>
+            <p className="text-[11px] text-muted-foreground">The order below is the bracket placement — use the arrows to decide who faces who. Pairs are formed top-to-bottom (1 vs 2, 3 vs 4, etc).</p>
             <div className="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1">
               {filteredParticipants.length > 0 ? (
                 filteredParticipants.map((p, idx) => {
@@ -418,7 +418,7 @@ export function TournamentAdminPanel() {
                   );
                 })
               ) : searchQuery ? (
-                <span className="text-xs text-muted-foreground text-center py-4">No shooters found matching \"{searchQuery}\"</span>
+                <span className="text-xs text-muted-foreground text-center py-4">No shooters found matching "{searchQuery}"</span>
               ) : (
                 <span className="text-xs text-muted-foreground">No participants yet.</span>
               )}
@@ -493,7 +493,7 @@ export function TournamentAdminPanel() {
                 <Button size="sm" className="btn-luxury text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "won")}>Won</Button>
                 <Button size="sm" variant="outline" className="text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "qualified")}>Qualified</Button>
                 <Button size="sm" variant="outline" className="text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "won")}>Lost</Button>
-                <Button size="sm" variant="destructive" className="text-xs" disabled={!rB || !rA} onClick={() => submitResult(resultMatch!.participant_b_id, "won", resultMatch!.participant_a_id)}>Disqualify</Button>
+                <Button size="sm" variant="destructive" className="text-xs" disabled={!rB || !rA} onClick={() => submitResult(resultMatch!.participant_b_id, "won", resultMatch!.participant_a_id)}>DQ</Button>
               </div>
             </div>
             {/* Participant B outcomes */}
@@ -503,7 +503,7 @@ export function TournamentAdminPanel() {
                 <Button size="sm" className="btn-luxury text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "won")}>Won</Button>
                 <Button size="sm" variant="outline" className="text-xs" disabled={!rB} onClick={() => submitResult(resultMatch!.participant_b_id, "qualified")}>Qualified</Button>
                 <Button size="sm" variant="outline" className="text-xs" disabled={!rA} onClick={() => submitResult(resultMatch!.participant_a_id, "won")}>Lost</Button>
-                <Button size="sm" variant="destructive" className="text-xs" disabled={!rA || !rB} onClick={() => submitResult(resultMatch!.participant_a_id, "won", resultMatch!.participant_b_id)}>Disqualify</Button>
+                <Button size="sm" variant="destructive" className="text-xs" disabled={!rA || !rB} onClick={() => submitResult(resultMatch!.participant_a_id, "won", resultMatch!.participant_b_id)}>DQ</Button>
               </div>
             </div>
             <Button variant="outline" className="w-full" onClick={() => submitResult(null)}>Save scores only (no winner yet)</Button>
