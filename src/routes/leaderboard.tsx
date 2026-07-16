@@ -107,7 +107,7 @@ function Page() {
           </TabsList>
 
           <TabsContent value="gangs" className="mt-4">
-            <Board rows={gangs} firstCol="Team / Scorer" secondCol="Top Player" pick={(g) => g.top_player || "—"} emptyText="No data yet." />
+            <Board rows={gangs} firstCol="Team / Scorer" secondCol="Top Player" pick={(g) => g.name} secondPick={(g) => g.top_player || "—"} emptyText="No data yet." />
           </TabsContent>
 
           <TabsContent value="shooters" className="mt-4">
@@ -120,13 +120,14 @@ function Page() {
 }
 
 function Board({
-  rows, firstCol, secondCol, pick, firstPick, emptyText,
+  rows, firstCol, secondCol, pick, firstPick, secondPick, emptyText,
 }: {
   rows: LbRow[];
   firstCol: string;
   secondCol: string;
   pick: (r: LbRow) => string;
   firstPick?: (r: LbRow) => string;
+  secondPick?: (r: LbRow) => string;
   emptyText: string;
 }) {
   return (
@@ -144,8 +145,8 @@ function Board({
             {rows.map((r, i) => (
               <tr key={r.name} className="border-b border-amber-400/10 hover:bg-amber-400/10 transition-colors">
                 <Td><Medal i={i} /></Td>
-                <Td>{firstPick ? <span className="font-bold text-primary/90">{firstPick(r)}</span> : <span className="font-bold">{pick(r)}</span>}</Td>
-                <Td><span className={firstPick ? "font-bold" : "text-muted-foreground"}>{firstPick ? pick(r) : (r.top_player || "—")}</span></Td>
+                <Td><span className="font-bold text-primary/90">{firstPick ? firstPick(r) : pick(r)}</span></Td>
+                <Td><span className={firstPick ? "font-bold" : "text-muted-foreground"}>{secondPick ? secondPick(r) : (firstPick ? pick(r) : (r.top_player || "—"))}</span></Td>
                 <Td right><Pill tone="amber">{r.TS}</Pill></Td>
                 <Td right><span className="text-emerald-400 font-bold">{r.W}</span></Td>
                 <Td right><span className="text-destructive font-bold">{r.L}</span></Td>
