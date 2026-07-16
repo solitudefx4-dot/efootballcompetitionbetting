@@ -57,7 +57,7 @@ function RegisterPage() {
     confirm_password: "",
     gang_type: "",
     gang_name: "",
-    server: "LOMITA AFR",
+    region: "LOMITA AFR",
     referral_code: "",
   });
   const [accepted, setAccepted] = useState(false);
@@ -71,9 +71,12 @@ function RegisterPage() {
     if (!f.ingame_name.trim()) return toast.error("In-game full name is required");
     if (!f.discord_full_name.trim()) return toast.error("Discord full name is required");
     if (!f.discord_username.trim()) return toast.error("Discord username is required");
-    if (!f.gang_type) return toast.error("Select Faction (F) or Gang (G)");
-    if (!f.gang_name.trim()) return toast.error(`${f.gang_type === "F" ? "Faction" : "Gang"} name is required`);
-    if (!f.server.trim()) return toast.error("Server is required");
+    if (!f.gang_type) return toast.error("Select Faction (F), Gang (G), or E-Football (E)");
+    if (!f.gang_name.trim()) {
+      const label = f.gang_type === "F" ? "Faction" : f.gang_type === "E" ? "E-Football team" : "Gang";
+      return toast.error(`${label} name is required`);
+    }
+    if (!f.region.trim()) return toast.error("Region is required");
     if (f.password.length < 6) return toast.error("Password must be at least 6 characters");
     if (f.password !== f.confirm_password) return toast.error("Passwords do not match");
     setLoading(true);
@@ -87,7 +90,7 @@ function RegisterPage() {
           discord_full_name: f.discord_full_name,
           discord_username: f.discord_username,
           phone: f.phone,
-          server: f.server,
+          region: f.region,
           gang_name: f.gang_name,
           gang_type: f.gang_type,
           referral_code: f.referral_code.trim().toUpperCase() || null,
@@ -134,22 +137,40 @@ function RegisterPage() {
             <div><Label>Phone *</Label><Input required type="tel" maxLength={32} value={f.phone} onChange={(e) => set("phone", e.target.value)} /></div>
             <div><Label>Password *</Label><Input type="password" required minLength={6} value={f.password} onChange={(e) => set("password", e.target.value)} /></div>
             <div><Label>Confirm password *</Label><Input type="password" required minLength={6} value={f.confirm_password} onChange={(e) => set("confirm_password", e.target.value)} /></div>
-            <div className="md:col-span-2"><Label>Faction or Gang *</Label>
+            <div className="md:col-span-2"><Label>Faction, Gang or E-Football *</Label>
               <Select value={f.gang_type} onValueChange={(v) => set("gang_type", v)}>
-                <SelectTrigger><SelectValue placeholder="Select F (Faction) or G (Gang)" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select F (Faction), G (Gang) or E (E-Football)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="F">F — Faction</SelectItem>
                   <SelectItem value="G">G — Gang</SelectItem>
+                  <SelectItem value="E">E — E-Football</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {f.gang_type && (
               <div className="md:col-span-2">
-                <Label>{f.gang_type === "F" ? "Faction name" : "Gang name"} *</Label>
-                <Input required maxLength={60} placeholder={`Enter your ${f.gang_type === "F" ? "faction" : "gang"} name`} value={f.gang_name} onChange={(e) => set("gang_name", e.target.value)} />
+                <Label>
+                  {f.gang_type === "F" ? "Faction name" : f.gang_type === "E" ? "E-Football team name" : "Gang name"} *
+                </Label>
+                <Input
+                  required
+                  maxLength={60}
+                  placeholder={
+                    f.gang_type === "F"
+                      ? "Enter your faction name"
+                      : f.gang_type === "E"
+                        ? "Enter your E-Football team name (e.g. Barcelona FC)"
+                        : "Enter your gang name"
+                  }
+                  value={f.gang_name}
+                  onChange={(e) => set("gang_name", e.target.value)}
+                />
+                {f.gang_type === "E" && (
+                  <p className="text-[11px] text-muted-foreground mt-1">This is your E-Football club name — enter it exactly as it appears in-game.</p>
+                )}
               </div>
             )}
-            <div className="md:col-span-2"><Label>Server *</Label><Input required maxLength={60} value={f.server} onChange={(e) => set("server", e.target.value)} /></div>
+            <div className="md:col-span-2"><Label>Region *</Label><Input required maxLength={60} value={f.region} onChange={(e) => set("region", e.target.value)} placeholder="e.g. LOMITA AFR" /></div>
             <div className="md:col-span-2">
               <Label>Referral code <span className="text-muted-foreground font-normal">(optional)</span></Label>
               <Input

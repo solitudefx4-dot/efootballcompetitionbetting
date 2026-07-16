@@ -634,13 +634,21 @@ function serverNow() {
 
 function newestVirtualBatch(rows: VirtualMatch[]): VirtualMatch[] {
   if (rows.length === 0) return [];
+  // Prefer rows that carry an explicit batch id — stray individual matches
+  // (batch_id = null) otherwise each form their own single-match "batch"
+  // and can silently hide the real round. Fall back to id-per-group only
+  // when nothing in the set has a batch id.
+  const withBatch = rows.filter((r) => r.virtual_round_batch_id);
+  const pool = withBatch.length > 0 ? withBatch : rows;
   const groups = new Map<string, VirtualMatch[]>();
-  rows.forEach((row) => {
+  pool.forEach((row) => {
     const key = row.virtual_round_batch_id ?? row.id;
     groups.set(key, [...(groups.get(key) ?? []), row]);
   });
   return (
     [...groups.values()].sort((a, b) => {
+      // Larger batches beat smaller ones; on a tie, the newer lock/start time wins.
+      if (a.length !== b.length) return b.length - a.length;
       const newestA = Math.max(...a.map((m) => new Date(m.lock_time ?? m.start_time).getTime()));
       const newestB = Math.max(...b.map((m) => new Date(m.lock_time ?? m.start_time).getTime()));
       return newestB - newestA;
