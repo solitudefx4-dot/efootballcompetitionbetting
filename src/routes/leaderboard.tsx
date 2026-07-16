@@ -37,7 +37,7 @@ function Medal({ i }: { i: number }) {
   if (i < 3) {
     return (
       <span className="inline-flex items-center gap-1.5">
-        <span className={`inline-grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-b ${tiers[i]} text-black font-black text-sm shadow-[0_0_14px_-2px_rgba(212,175,55,0.6)] border border-whi[...]
+        <span className={`inline-grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-b ${tiers[i]} text-black font-black text-sm shadow-[0_0_14px_-2px_rgba(212,175,55,0.6)] border border-white/30`}>
           {i + 1}
         </span>
         <MedalIcon className={`h-5 w-5 ${medalColors[i]} drop-shadow-[0_0_6px_rgba(212,175,55,0.6)]`} />
@@ -64,7 +64,7 @@ function Page() {
       .on("postgres_changes", { event: "*", schema: "public", table: "leaderboard_overrides" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, () =>
-        supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle().then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url || leaderboardHeaderAsset.url[...]
+        supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle().then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url || leaderboardHeaderAsset.url))
       )
       .subscribe();
     return () => { supabase.removeChannel(ch); };
