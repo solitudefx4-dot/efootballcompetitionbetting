@@ -168,7 +168,6 @@ export function TournamentAdminPanel() {
 
     // build from final round down so we know next_match ids
     let aboveIds: string[] = [];
-    let round1Rows: any[] = [];
     for (let r = totalRounds; r >= 1; r--) {
       const matchesInRound = size / Math.pow(2, r);
       const rows = Array.from({ length: matchesInRound }, (_, j) => {
@@ -185,29 +184,16 @@ export function TournamentAdminPanel() {
         }
         return row;
       });
-      const { data, error } = await (supabase as any).from("tournament_matches").insert(rows).select("id,slot,next_match_id,next_slot,participant_a_id,participant_b_id");
+      const { data, error } = await (supabase as any).from("tournament_matches").insert(rows).select("id,slot,next_match_id,next_slot");
       if (error) { toast.error(error.message); return; }
       const sorted = (data ?? []).sort((a: any, b: any) => a.slot - b.slot);
       aboveIds = sorted.map((d: any) => d.id);
-      if (r === 1) round1Rows = sorted;
     }
 
-    // auto-advance byes: any first-round match with exactly one participant is won by default,
-    // so we never render empty/incomplete bracket slots.
-    for (const m of round1Rows) {
-      const a = m.participant_a_id, b = m.participant_b_id;
-      const hasA = !!a, hasB = !!b;
-      if (hasA !== hasB) {
-        const winner = a || b;
-        await (supabase as any).from("tournament_matches").update({ winner_id: winner, status: "completed" }).eq("id", m.id);
-        if (m.next_match_id) {
-          const col = m.next_slot === "b" ? "participant_b_id" : "participant_a_id";
-          await (supabase as any).from("tournament_matches").update({ [col]: winner }).eq("id", m.next_match_id);
-        }
-        // BUG FIX: Do NOT update current_round here - it causes empty bracket slots
-        // The round progression should be handled by the match flow, not bracket generation
-      }
-    }
+    // FIX: DO NOT auto-advance byes during generation
+    // Byes must be manually marked as "Won" by the admin through the match result dialog
+    // This ensures proper tournament flow and prevents empty bracket slots
+    
     toast.success("Bracket generated");
     loadDetail(sel.id);
   }
