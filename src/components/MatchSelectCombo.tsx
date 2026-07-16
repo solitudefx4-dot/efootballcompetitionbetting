@@ -3,10 +3,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Search, X } from "lucide-react";
 
-type Match = { id: string; name: string; home_score: number | null; away_score: number | null; status: string };
+export type MatchType = { id: string; name: string; home_score: number | null; away_score: number | null; status: string };
 
 type MatchSelectComboProps = {
-  matches: Match[];
+  matches: MatchType[];
   value: string;
   onChange: (matchId: string) => void;
   placeholder?: string;

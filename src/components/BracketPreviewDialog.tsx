@@ -3,8 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Wand2, GripVertical, X } from "lucide-react";
-import { type TParticipant } from "./TournamentBracket";
+import { Wand2, GripVertical } from "lucide-react";
+
+export type TParticipant = { id: string; name: string; logo_url: string | null; is_eliminated?: boolean; current_round?: number; is_disqualified?: boolean };
 
 type BracketPreviewDialogProps = {
   open: boolean;
@@ -29,17 +30,6 @@ export function BracketPreviewDialog({
 }: BracketPreviewDialogProps) {
   const participantMap = useMemo(() => Object.fromEntries(participants.map((p) => [p.id, p])), [participants]);
 
-  // Calculate bracket rounds
-  const rounds = useMemo(() => {
-    const totalSlots = bracketSlots.length;
-    const roundCount = Math.log2(totalSlots);
-    const slotsPerRound: number[] = [];
-    for (let i = 0; i < roundCount; i++) {
-      slotsPerRound.push(Math.pow(2, roundCount - 1 - i));
-    }
-    return slotsPerRound;
-  }, [bracketSlots]);
-
   // Map slots to their bracket positions
   const matchupPreview = useMemo(() => {
     const matchups: Array<{ slotA: number; slotB: number; matchIdx: number }> = [];
@@ -60,7 +50,7 @@ export function BracketPreviewDialog({
             Bracket Preview & Customization
           </DialogTitle>
           <DialogDescription>
-            Assign participants to bracket slots and see matchups before generating. Drag to reorder or use the dropdowns.
+            Assign participants to bracket slots and see matchups before generating. Use the dropdowns to assign participants.
           </DialogDescription>
         </DialogHeader>
 
