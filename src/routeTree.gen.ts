@@ -25,7 +25,6 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PollsRouteImport } from './routes/polls'
 import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as ModRouteImport } from './routes/mod'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LotteryRouteImport } from './routes/lottery'
 import { Route as LoginRouteImport } from './routes/login'
@@ -38,7 +37,6 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as BetHistoryRouteImport } from './routes/bet-history'
 import { Route as ArcadeRouteImport } from './routes/arcade'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -137,11 +135,6 @@ const NotificationsRoute = NotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ModRoute = ModRouteImport.update({
-  id: '/mod',
-  path: '/mod',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
@@ -200,11 +193,6 @@ const BetHistoryRoute = BetHistoryRouteImport.update({
 const ArcadeRoute = ArcadeRouteImport.update({
   id: '/arcade',
   path: '/arcade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AchievementsRoute = AchievementsRouteImport.update({
@@ -301,7 +289,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/achievements': typeof AchievementsRoute
-  '/admin': typeof AdminRoute
   '/arcade': typeof ArcadeRoute
   '/bet-history': typeof BetHistoryRoute
   '/chat': typeof ChatRoute
@@ -314,7 +301,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
-  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -350,7 +336,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/achievements': typeof AchievementsRoute
-  '/admin': typeof AdminRoute
   '/arcade': typeof ArcadeRoute
   '/bet-history': typeof BetHistoryRoute
   '/chat': typeof ChatRoute
@@ -363,7 +348,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
-  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -400,7 +384,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/achievements': typeof AchievementsRoute
-  '/admin': typeof AdminRoute
   '/arcade': typeof ArcadeRoute
   '/bet-history': typeof BetHistoryRoute
   '/chat': typeof ChatRoute
@@ -413,7 +396,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
-  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -451,7 +433,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/achievements'
-    | '/admin'
     | '/arcade'
     | '/bet-history'
     | '/chat'
@@ -464,7 +445,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
-    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -500,7 +480,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/achievements'
-    | '/admin'
     | '/arcade'
     | '/bet-history'
     | '/chat'
@@ -513,7 +492,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
-    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -549,7 +527,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/achievements'
-    | '/admin'
     | '/arcade'
     | '/bet-history'
     | '/chat'
@@ -562,7 +539,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
-    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -599,7 +575,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AchievementsRoute: typeof AchievementsRoute
-  AdminRoute: typeof AdminRoute
   ArcadeRoute: typeof ArcadeRoute
   BetHistoryRoute: typeof BetHistoryRoute
   ChatRoute: typeof ChatRoute
@@ -612,7 +587,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   LotteryRoute: typeof LotteryRoute
   MatchesRoute: typeof MatchesRouteWithChildren
-  ModRoute: typeof ModRoute
   NotificationsRoute: typeof NotificationsRoute
   PollsRoute: typeof PollsRoute
   ProfileRoute: typeof ProfileRoute
@@ -758,13 +732,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mod': {
-      id: '/mod'
-      path: '/mod'
-      fullPath: '/mod'
-      preLoaderRoute: typeof ModRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/matches': {
       id: '/matches'
       path: '/matches'
@@ -847,13 +814,6 @@ declare module '@tanstack/react-router' {
       path: '/arcade'
       fullPath: '/arcade'
       preLoaderRoute: typeof ArcadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/achievements': {
@@ -993,7 +953,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AchievementsRoute: AchievementsRoute,
-  AdminRoute: AdminRoute,
   ArcadeRoute: ArcadeRoute,
   BetHistoryRoute: BetHistoryRoute,
   ChatRoute: ChatRoute,
@@ -1006,7 +965,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   LotteryRoute: LotteryRoute,
   MatchesRoute: MatchesRouteWithChildren,
-  ModRoute: ModRoute,
   NotificationsRoute: NotificationsRoute,
   PollsRoute: PollsRoute,
   ProfileRoute: ProfileRoute,
@@ -1041,13 +999,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
