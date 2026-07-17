@@ -63,11 +63,26 @@ function Page() {
       .channel("leaderboard-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "leaderboard_overrides" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "teams" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "players" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, () =>
         supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle().then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url || leaderboardHeaderAsset.url))
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    // Also refetch on tab focus / visibility change so any missed realtime event
+    // (e.g. while the tab was backgrounded during a team-match settlement) is picked up.
+    const onFocus = () => run();
+    const onVis = () => { if (document.visibilityState === "visible") run(); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVis);
+    // Safety net: poll every 20s so gang standings stay in sync even if realtime drops
+    const poll = window.setInterval(run, 20000);
+    return () => {
+      supabase.removeChannel(ch);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+      window.clearInterval(poll);
+    };
   }, []);
 
   useEffect(() => {

@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Plus, Trash2, Crown, Swords, Wand2, ArrowUp, ArrowDown, ImageIcon, Search, X, ChevronDown } from "lucide-react";
+import { Trophy, Plus, Trash2, Crown, Swords, Wand2, ArrowUp, ArrowDown, ImageIcon, Search, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { notifyAction } from "@/lib/notify-action";
 import { TournamentBracket, type TMatch, type TParticipant, type Tournament } from "@/components/TournamentBracket";
+import { BracketPreviewDialog } from "@/components/admin/BracketPreviewDialog";
+import { MatchSelectCombo } from "@/components/admin/MatchSelectCombo";
 
 /** Upload a bracket image from device storage to a public bucket and return its URL. */
 async function uploadBracketImage(file: File): Promise<string | null> {
@@ -68,10 +70,6 @@ export function TournamentAdminPanel() {
   const [bracketSlots, setBracketSlots] = useState<(string | null)[]>([]);
   const [slotAssignments, setSlotAssignments] = useState<Map<number, string | null>>(new Map());
 
-  // match list pagination
-  const [matchPage, setMatchPage] = useState(1);
-  const matchesPerPage = 15;
-
   const sel = useMemo(() => tournaments.find((t) => t.id === selId) ?? null, [tournaments, selId]);
   const partMap = useMemo(() => Object.fromEntries(participants.map((p) => [p.id, p])), [participants]);
 
@@ -80,14 +78,6 @@ export function TournamentAdminPanel() {
     () => participants.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [participants, searchQuery]
   );
-
-  // Paginated linkable matches
-  const paginatedMatches = useMemo(() => {
-    const start = (matchPage - 1) * matchesPerPage;
-    return linkableMatches.slice(start, start + matchesPerPage);
-  }, [linkableMatches, matchPage, matchesPerPage]);
-
-  const totalMatchPages = Math.ceil(linkableMatches.length / matchesPerPage);
 
   async function loadTournaments() {
     const { data } = await (supabase as any).from("tournaments").select("*").order("created_at", { ascending: false });
@@ -187,6 +177,31 @@ export function TournamentAdminPanel() {
     const newAssignments = new Map(slotAssignments);
     newAssignments.set(slotIndex, participantId);
     setSlotAssignments(newAssignments);
+  }
+
+  // Swap two slot assignments (used by the "swap this matchup" button in preview)
+  function swapSlots(a: number, b: number) {
+    const n = new Map(slotAssignments);
+    const va = n.get(a) ?? null;
+    const vb = n.get(b) ?? null;
+    n.set(a, vb);
+    n.set(b, va);
+    setSlotAssignments(n);
+  }
+
+  // Auto-seed: re-apply the default 1-vs-N seeding from the current participant order
+  function autoSeed() {
+    const size = bracketSlots.length;
+    let seedPos: number[] = [1, 2];
+    const totalRounds = Math.log2(size);
+    for (let r = 1; r < totalRounds; r++) {
+      const sum = seedPos.length * 2 + 1;
+      const next: number[] = [];
+      for (const p of seedPos) { next.push(p); next.push(sum - p); }
+      seedPos = next;
+    }
+    const fresh = seedPos.map((seed) => participants[seed - 1]?.id ?? null);
+    setSlotAssignments(new Map(fresh.map((id, idx) => [idx, id])));
   }
 
   // Create bracket with custom assignments
@@ -434,7 +449,7 @@ export function TournamentAdminPanel() {
               )}
             </div>
             <div className="flex flex-wrap gap-2 items-center pt-1">
-              <Button className="btn-luxury" onClick={generateBracketPreview}><Wand2 className="h-4 w-4 mr-1" />Preview & Customize Bracket</Button>
+              <Button className="btn-luxury" onClick={generateBracketPreview}><Wand2 className="h-4 w-4 mr-1" />Preview &amp; Customize Bracket</Button>
               <div className="flex items-center gap-2">
                 <Label className="text-xs text-muted-foreground">Betting market</Label>
                 <select className="bg-background border border-border rounded-md text-sm px-2 py-1.5" value={sel.futures_match_id ?? ""} onChange={(e) => linkFutures(e.target.value)}>
@@ -458,50 +473,17 @@ export function TournamentAdminPanel() {
       )}
 
       {/* Bracket Preview & Customization Dialog */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="glass-strong border-primary/30 max-w-2xl backdrop-blur-2xl shadow-luxury overflow-hidden max-h-96 overflow-y-auto">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-gold" />
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Wand2 className="h-5 w-5 text-primary" />Bracket Preview & Customization</DialogTitle>
-            <DialogDescription>Assign participants to bracket slots. Click any empty slot to change the assignment.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-3">
-            <p className="text-[11px] text-amber-200">
-              <strong>Note:</strong> Your {participants.length} participants will fill {bracketSlots.length} bracket slots (rounded to nearest power of 2).
-            </p>
-            
-            <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto">
-              {bracketSlots.map((_, slotIdx) => {
-                const assigned = slotAssignments.get(slotIdx);
-                const assignedParticipant = assigned ? partMap[assigned] : null;
-                
-                return (
-                  <div key={slotIdx} className="border border-primary/30 rounded-lg p-2 bg-card/50">
-                    <div className="text-[10px] text-muted-foreground mb-1">Slot {slotIdx + 1}</div>
-                    <Select value={assigned ?? ""} onValueChange={(val) => assignParticipantToSlot(slotIdx, val || null)}>
-                      <SelectTrigger className="w-full h-8 text-xs">
-                        <SelectValue placeholder={assignedParticipant?.name ?? "— Empty —"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">— Empty (Bye) —</SelectItem>
-                        {participants.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Cancel</Button>
-            <Button className="btn-luxury" onClick={generateBracketFromPreview}>Generate Bracket</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <BracketPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        participants={participants}
+        slots={bracketSlots}
+        slotAssignments={slotAssignments}
+        onAssign={assignParticipantToSlot}
+        onSwap={swapSlots}
+        onShuffle={autoSeed}
+        onGenerate={generateBracketFromPreview}
+      />
 
       {/* glass result dialog */}
       <Dialog open={!!resultMatch} onOpenChange={(o) => !o && setResultMatch(null)}>
@@ -515,42 +497,11 @@ export function TournamentAdminPanel() {
           {/* link a real/live match — scores then auto-sync from it */}
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Linked live match (scores auto-update from it)</Label>
-            <div className="relative">
-              <Select value={linkId} onValueChange={(e) => { setMatchPage(1); linkLiveMatch(e); }}>
-                <SelectTrigger className="w-full"><SelectValue placeholder="— not linked —" /></SelectTrigger>
-                <SelectContent className="max-h-64">
-                  <SelectItem value="">— not linked —</SelectItem>
-                  {paginatedMatches.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.name} · {f.home_score ?? 0}–{f.away_score ?? 0} ({f.status})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {linkableMatches.length > matchesPerPage && (
-              <div className="flex items-center justify-between gap-2 pt-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={matchPage === 1}
-                  onClick={() => setMatchPage(p => p - 1)}
-                >
-                  ← Previous
-                </Button>
-                <span className="text-[10px] text-muted-foreground">
-                  Page {matchPage} of {totalMatchPages} ({linkableMatches.length} matches)
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={matchPage === totalMatchPages}
-                  onClick={() => setMatchPage(p => p + 1)}
-                >
-                  Next →
-                </Button>
-              </div>
-            )}
+            <MatchSelectCombo
+              value={linkId}
+              matches={linkableMatches}
+              onChange={(id) => linkLiveMatch(id)}
+            />
             {linkId && <p className="text-[11px] text-emerald-400">Scores below are pulled from the live match. They auto-update whenever the match score changes.</p>}
           </div>
 
