@@ -37,7 +37,7 @@ function Medal({ i }: { i: number }) {
   if (i < 3) {
     return (
       <span className="inline-flex items-center gap-1.5">
-        <span className={`inline-grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-b ${tiers[i]} text-black font-black text-sm shadow-[0_0_14px_-2px_rgba(212,175,55,0.6)] border border-white/30`}>
+        <span className={`inline-grid place-items-center h-8 w-8 rounded-lg bg-gradient-to-b ${tiers[i]} text-black font-black text-sm shadow-[0_0_14px_-2px_rgba(212,175,55,0.6)] border border-whi[...]
           {i + 1}
         </span>
         <MedalIcon className={`h-5 w-5 ${medalColors[i]} drop-shadow-[0_0_6px_rgba(212,175,55,0.6)]`} />
@@ -66,7 +66,7 @@ function Page() {
       .on("postgres_changes", { event: "*", schema: "public", table: "teams" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "players" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, () =>
-        supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle().then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url || leaderboardHeaderAsset.url))
+        supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle().then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url || leaderboardHeaderAsset.url[...]
       )
       .subscribe();
     // Also refetch on tab focus / visibility change so any missed realtime event
@@ -152,11 +152,11 @@ function Board({
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-widest text-amber-200/80 border-b border-amber-400/30 bg-black/20">
               <Th>Rank</Th><Th>{firstCol}</Th><Th>{secondCol}</Th>
-              <Th right>TS</Th><Th right>W</Th><Th right>L</Th><Th right>D</Th><Th right>P</Th><Th right>PTS</Th>
+              <Th right>TS</Th><Th right>W</Th><Th right>L</Th><Th right>D</Th><Th right>GD</Th><Th right>P</Th><Th right>PTS</Th>
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">{emptyText}</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={10} className="p-6 text-center text-muted-foreground">{emptyText}</td></tr>}
             {rows.map((r, i) => (
               <tr key={r.name} className="border-b border-amber-400/10 hover:bg-amber-400/10 transition-colors">
                 <Td><Medal i={i} /></Td>
@@ -166,6 +166,7 @@ function Board({
                 <Td right><span className="text-emerald-400 font-bold">{r.W}</span></Td>
                 <Td right><span className="text-destructive font-bold">{r.L}</span></Td>
                 <Td right><span className="text-amber-400 font-bold">{r.D}</span></Td>
+                <Td right><span className={r.GD >= 0 ? "text-emerald-400 font-bold" : "text-destructive font-bold"}>{r.GD >= 0 ? "+" : ""}{r.GD}</span></Td>
                 <Td right><span className="text-muted-foreground">{r.P}</span></Td>
                 <Td right><Pill tone="emerald">{r.PTS}</Pill></Td>
               </tr>
