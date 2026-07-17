@@ -25,6 +25,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PollsRouteImport } from './routes/polls'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as ModRouteImport } from './routes/mod'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as LotteryRouteImport } from './routes/lottery'
 import { Route as LoginRouteImport } from './routes/login'
@@ -134,6 +135,11 @@ const PollsRoute = PollsRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModRoute = ModRouteImport.update({
+  id: '/mod',
+  path: '/mod',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MatchesRoute = MatchesRouteImport.update({
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
+  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
+  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -405,6 +413,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/lottery': typeof LotteryRoute
   '/matches': typeof MatchesRouteWithChildren
+  '/mod': typeof ModRoute
   '/notifications': typeof NotificationsRoute
   '/polls': typeof PollsRoute
   '/profile': typeof ProfileRoute
@@ -455,6 +464,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
+    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -503,6 +513,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
+    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -551,6 +562,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/lottery'
     | '/matches'
+    | '/mod'
     | '/notifications'
     | '/polls'
     | '/profile'
@@ -600,6 +612,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   LotteryRoute: typeof LotteryRoute
   MatchesRoute: typeof MatchesRouteWithChildren
+  ModRoute: typeof ModRoute
   NotificationsRoute: typeof NotificationsRoute
   PollsRoute: typeof PollsRoute
   ProfileRoute: typeof ProfileRoute
@@ -743,6 +756,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mod': {
+      id: '/mod'
+      path: '/mod'
+      fullPath: '/mod'
+      preLoaderRoute: typeof ModRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/matches': {
@@ -986,6 +1006,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   LotteryRoute: LotteryRoute,
   MatchesRoute: MatchesRouteWithChildren,
+  ModRoute: ModRoute,
   NotificationsRoute: NotificationsRoute,
   PollsRoute: PollsRoute,
   ProfileRoute: ProfileRoute,
