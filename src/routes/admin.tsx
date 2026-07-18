@@ -2075,6 +2075,7 @@ function FutureTinyEmblem({ label, url }: { label: string; url?: string | null }
 }
 
 function MatchWizard({ onClose }: { onClose: () => void }) {
+  const confirm = useConfirm();
   const [step, setStep] = useState(1);
   const [teams, setTeams] = useState<any[]>([]);
   const [cats, setCats] = useState<any[]>([]);
@@ -2129,6 +2130,13 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
     const awayName = (details.homeIs === "A" ? teamB.name : teamA.name) || teams.find((t) => t.id === away_team_id)?.name;
     const homeOdds = details.homeIs === "A" ? details.oddsA : details.oddsB;
     const awayOdds = details.homeIs === "A" ? details.oddsB : details.oddsA;
+    const startLabel = details.start_time ? new Date(details.start_time).toLocaleString() : "immediately";
+    const ok = await confirm({
+      title: "Post this match?",
+      description: `${homeName} (home, odds ${homeOdds})\nDraw odds: ${details.draw}\n${awayName} (away, odds ${awayOdds})\nStart: ${startLabel}\nCorrect Score market: ${csEnabled ? `${csRows.length} scores` : "off"}\nFeatured on homepage: ${details.featured ? "Yes" : "No"}\n\nDouble-check names, odds and start time before posting. Users see this immediately.`,
+      confirmText: "Post match", cancelText: "Review again",
+    });
+    if (!ok) return;
     const { data: m, error } = await supabase.from("matches").insert({
       name: details.name || `${homeName} vs ${awayName}`,
       home_team_id, away_team_id,
