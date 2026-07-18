@@ -1637,7 +1637,7 @@ function ShooterMatchWizard({ onClose }: { onClose: () => void }) {
     const startLabel = form.start_time ? new Date(form.start_time).toLocaleString() : "immediately";
     const ok = await confirm({
       title: "Post this shooter match?",
-      description: `Shooter A: ${home?.name} (odds ${form.oddsA})\nDraw odds: ${form.draw}\nShooter B: ${away?.name} (odds ${form.oddsB})\nStart: ${startLabel}\nFeatured on homepage: ${form.featured ? "Yes" : "No"}\n\nOnce posted, users can start placing bets immediately.`,
+      description: `${home?.name} (${form.oddsA}) vs ${away?.name} (${form.oddsB}) · Draw ${form.draw} · Start ${startLabel} · Featured: ${form.featured ? "Yes" : "No"}. Users can bet immediately once posted.`,
       confirmText: "Post match", cancelText: "Review again",
     });
     if (!ok) return;
@@ -2133,7 +2133,7 @@ function MatchWizard({ onClose }: { onClose: () => void }) {
     const startLabel = details.start_time ? new Date(details.start_time).toLocaleString() : "immediately";
     const ok = await confirm({
       title: "Post this match?",
-      description: `${homeName} (home, odds ${homeOdds})\nDraw odds: ${details.draw}\n${awayName} (away, odds ${awayOdds})\nStart: ${startLabel}\nCorrect Score market: ${csEnabled ? `${csRows.length} scores` : "off"}\nFeatured on homepage: ${details.featured ? "Yes" : "No"}\n\nDouble-check names, odds and start time before posting. Users see this immediately.`,
+      description: `${homeName} (${homeOdds}) vs ${awayName} (${awayOdds}) · Draw ${details.draw} · Start ${startLabel} · CS market: ${csEnabled ? `${csRows.length} scores` : "off"} · Featured: ${details.featured ? "Yes" : "No"}. Double-check before posting — users see this immediately.`,
       confirmText: "Post match", cancelText: "Review again",
     });
     if (!ok) return;
